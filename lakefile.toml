@@ -1,0 +1,10 @@
+name = "cvx-opt"
+version = "0.1.0"
+defaultTargets = ["cvx-opt"]
+
+[[lean_lib]]
+name = "CvxOpt"
+
+[[lean_exe]]
+name = "cvx-opt"
+root = "Main"
