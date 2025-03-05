@@ -1,3 +1,42 @@
+# 2025/03/04 adding dependency `mathlib`
+- instructions say "add this to your lakefile.toml" - https://github.com/leanprover-community/mathlib4/wiki/Using-mathlib4-as-a-dependency#in-an-existing-project:
+	```toml
+	[[require]]
+	name = "mathlib"
+	scope = "leanprover-community"
+	```
+- -> ❌ `lake build` fails, `lake update` fails with:
+	```
+	**warning:** toolchain not updated; multiple toolchain candidates:
+	
+	  leanprover/lean4:4.16.0
+	
+	    from «cvx-opt»
+	
+	  leanprover/lean4:v4.18.0-rc1
+	
+	    from mathlib
+	
+	**info:** mathlib: running post-update hooks
+	
+	**✖ [3/12] Building Cache.IO**
+	
+	**trace:** .> LEAN_PATH=././.lake/packages/Cli/.lake/build/lib:././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /nix/store/72i4gnyvfwlrjdgn22qmyy29331akygf-lean4-4.16.0/bin/lean ././.lake/packages/mathlib/././Cache/IO.lean -R ././.lake/packages/mathlib/./. -o ././.lake/packages/mathlib/.lake/build/lib/Cache/IO.olean -i ././.lake/packages/mathlib/.lake/build/lib/Cache/IO.ilean -c ././.lake/packages/mathlib/.lake/build/ir/Cache/IO.c --json
+	
+	**error:** ././.lake/packages/mathlib/././Cache/IO.lean:7:0: object file '././.lake/packages/proofwidgets/.lake/build/lib/Lean/Util/Paths.olean' of module Lean.Util.Paths does not exist
+	
+	**error:** Lean exited with code 1
+	
+	Some required builds logged failures:
+	
+	- Cache.IO
+	
+	**error:** build failed
+	```
+- <- maybe set version via this?: https://github.com/leanprover-community/mathlib4/wiki/Using-mathlib4-as-a-dependency#dealing-with-breakages-from-updating
+	- `lake build` -> ❌ more errors
+	- <- run `lake clean` first, `lake update` & ignore errors
+	- `lake build` -> ✅ LOOOONG build time, but succeeded
 # 2025/03/04 using LSP in Sublime?
 - LSP is allegedly built into the compiler (tbh this makes a lot of sense from a design standpoint, ty devs) - https://lean-lang.org/lean4/doc/setup.html#editing
 
