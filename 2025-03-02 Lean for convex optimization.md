@@ -1,3 +1,4 @@
+
 # 2025/03/04 adding dependency `mathlib`
 - instructions say "add this to your lakefile.toml" - https://github.com/leanprover-community/mathlib4/wiki/Using-mathlib4-as-a-dependency#in-an-existing-project:
 	```toml
@@ -88,3 +89,17 @@ fix: add `pkgs.gcc` to nix-shell file -> ✅
 	- go to Command Palette: "Preferences: Browse Packages" -> reveals a folder
 	- make a new folder there for your "package"
 	- move the `*.tmLanguage` file to that new folder
+
+# misc references
+- all the references - https://leanprover-community.github.io/learn.html
+- language reference - https://lean-lang.org/doc/reference/latest/
+- mathlib
+	- index - https://leanprover-community.github.io/mathlib-overview.html
+	- docs - https://leanprover-community.github.io/mathlib4_docs/index.html
+- theorem proving in Lean - https://leanprover.github.io/theorem_proving_in_lean4/title_page.html
+	- `theorem` vs. `def` - https://leanprover.github.io/theorem_proving_in_lean4/propositions_and_proofs.html#working-with-propositions-as-types
+- theorem-proving tactics
+	- index - https://www.ma.imperial.ac.uk/~buzzard/xena/formalising-mathematics-2024/Part_C/Part_C.html
+	- cheatsheet - https://leanprover-community.github.io/papers/lean-tactics.pdf
+- coding
+	- tutorial - https://lean-lang.org/functional_programming_in_lean/
