@@ -1,6 +1,29 @@
 import Mathlib.Order.Bounds.Basic
 import Mathlib.Algebra.Order.Group.Basic
 import Mathlib.Algebra.Group.Defs
+import Mathlib.Algebra.Order.Group.Unbundled.Abs
+import Mathlib.Algebra.Module.Defs
+import Mathlib.Algebra.Field.Defs
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.Analysis.Normed.Module.Basic
+import Mathlib.Analysis.Normed.Lp.WithLp
+import Mathlib.Algebra.Order.Group.Unbundled.Abs
+import Init.Prelude
+import Mathlib.Data.Matrix.Defs
+import Mathlib.Topology.MetricSpace.Defs
+import Mathlib.Data.PNat.Notation
+import Mathlib.Data.Real.ConjExponents
+
+
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+-- import Mathlib.LinearAlgebra.Eigenspace.Minpoly
+-- import Mathlib.LinearAlgebra.Charpoly.Basic
+-- import Mathlib.Data.Complex.FiniteDimensional
+
+-- import Mathlib.Tactic
+-- import Mathlib.Util.Delaborators
+
+-- set_option warningAsError false
 
 -- https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Order/Group/Defs.html#neg_le_neg
 
@@ -15,10 +38,10 @@ uses CvxLean as a reference:
 -/
 
 
-/- Minimization -/
+/-- min of f(x) for all x in C -/
 structure MinimumOn
-    {Domain: Type u}
-    {Range: Type u} [Preorder Range]
+    {Domain: Type*}
+    {Range: Type*} [Preorder Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
     where
@@ -26,10 +49,10 @@ structure MinimumOn
     yIsInImage : ∃ x ∈ ConstraintSet, objective x = value
     isMin: ∀ x ∈ ConstraintSet, value ≤ objective x
 
-/- Maximization -/
+/-- max of f(x) for all x in C -/
 structure MaximumOn
-    {Domain: Type u}
-    {Range: Type u} [Preorder Range]
+    {Domain: Type*}
+    {Range: Type*} [Preorder Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
     where
@@ -40,7 +63,8 @@ structure MaximumOn
 /- Remark -/
 /-- min_x f(x) = -max_x (-f(x)) -/
 def min_obj_to_neg_max_neg_obj
-    {D R : Type} [OrderedAddCommGroup R]
+    {D : Type*}
+    {R : Type*} [OrderedAddCommGroup R]
     {f: D → R}
     {C: Set D}
     (min: MinimumOn f C)
@@ -62,7 +86,8 @@ def min_obj_to_neg_max_neg_obj
 
 /-- max_x f(x) = -min_x (-f(x)) -/
 def max_obj_to_neg_min_neg_obj
-    {D R : Type} [OrderedAddCommGroup R]
+    {D : Type*}
+    {R : Type*} [OrderedAddCommGroup R]
     {f: D → R}
     {C: Set D}
     (max: MaximumOn f C)
@@ -81,3 +106,102 @@ def max_obj_to_neg_min_neg_obj
             intro xInC
             have maxGeX := max.isMax x xInC
             exact neg_le_neg maxGeX
+
+/-- y s.t. f(y) = min of f(x) for all x in C -/
+def ArgumentMinimumOn
+    {Domain: Type*}
+    {Range: Type*} [Preorder Range]
+    (objective: Domain → Range)
+    (ConstraintSet: Set Domain)
+    : Set Domain
+    := setOf fun xmin: Domain =>
+        xmin ∈ ConstraintSet
+        ∧ ∀ x ∈ ConstraintSet, objective xmin ≤ objective x
+
+private def is_le_image_on
+    {Domain: Type*}
+    {Range: Type*} [Preorder Range]
+    (objective: Domain → Range)
+    (ConstraintSet: Set Domain)
+    (y : Range)
+    : Prop
+    := ∀ x ∈ ConstraintSet, y ≤ objective x
+
+/-- inf of f(x) for all x in C -/
+structure InfimumOn
+    {Domain: Type*}
+    {Range: Type*} [Preorder Range]
+    (objective: Domain → Range)
+    (ConstraintSet: Set Domain)
+    where
+    value : Range
+    isLtAll : is_le_image_on objective ConstraintSet value
+    isLargestLtAll:
+        ∀ y : Range, is_le_image_on objective ConstraintSet y -> y ≤ value
+
+private def is_ge_image_on
+    {Domain: Type*}
+    {Range: Type*} [Preorder Range]
+    (objective: Domain → Range)
+    (ConstraintSet: Set Domain)
+    (y : Range)
+    : Prop
+    := ∀ x ∈ ConstraintSet, y ≤ objective x
+
+/-- sup of f(x) for all x in C -/
+structure SupremumOn
+    {Domain: Type*}
+    {Range: Type*} [Preorder Range]
+    (objective: Domain → Range)
+    (ConstraintSet: Set Domain)
+    where
+    value : Range
+    isLtAll : is_ge_image_on objective ConstraintSet value
+    isLargestLtAll:
+        ∀ y : Range, is_ge_image_on objective ConstraintSet y -> value ≤ y
+
+/--
+If a function is L-continuous, any two points that are a distance `d` apart
+are no more than `L * d` apart when mapped through the function.
+-/
+structure LipschitzContinuous
+    [Field ℝ] [Lattice ℝ]
+    {ℝn : Type*} [NormedAddCommGroup ℝn] [NormedSpace ℝ ℝn]
+    (f : ℝn → ℝ)
+    where
+    L : NNReal
+    h : ∀ x y : ℝn, abs ((f y) - (f x)) ≤ L * dist y x
+
+
+def Vec
+    (E : Type u)
+    (n : Nat)
+    : Type u
+    := Fin n → E
+
+-- theorem holder_inequality
+--     (D : Type*) [AddCommGroup D]
+--     (p : ENNReal)
+--     (pnz : p ≥ 1)
+--     (q : ENNReal)
+--     (qnz : q ≥ 1)
+--     (invAddEq : 1/p + 1/q = 1)
+--     (x : lp D p)
+--     (y : lp D q)
+--     : norm (x * y) ≤ ‖x‖ * ‖y‖
+--     := sorry
+
+theorem holder_inequality
+    (D : Type*) [AddCommGroup D]
+    (p q: ENNReal)
+    (pnz : p ≥ 1)
+    (qnz : q ≥ 1)
+    (invAddEq : p.IsConjExponent q)
+    (x : lp D p)
+    (y : lp D q)
+    : norm (x * y) ≤ ‖x‖ * ‖y‖
+    := sorry
+
+
+#eval ![1, 2] + ![3, 4]  -- ![4, 6]
+#check ![1, 2]

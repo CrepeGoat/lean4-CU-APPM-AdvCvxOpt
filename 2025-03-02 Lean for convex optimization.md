@@ -1,3 +1,12 @@
+# 2025/03/11 vectors?
+- example of vectors
+	- docs w/ example code - https://leanprover-community.github.io/mathematics_in_lean/C09_Linear_Algebra.html#matrices
+	- example code & imports - https://github.com/leanprover-community/mathematics_in_lean/blob/master/MIL/C09_Linear_Algebra/S04_Bases.lean
+	```lean4
+	#eval ![1, 2] + ![3, 4] -- ![4, 6]
+	#check ![1, 2] -- **⊢** Fin (Nat.succ 0).succ → ℕ
+	```
+	-> vectors are just maps from integer indices to values
 
 # 2025/03/04 adding dependency `mathlib`
 - instructions say "add this to your lakefile.toml" - https://github.com/leanprover-community/mathlib4/wiki/Using-mathlib4-as-a-dependency#in-an-existing-project:
@@ -96,11 +105,14 @@ fix: add `pkgs.gcc` to nix-shell file -> ✅
 - mathlib
 	- index - https://leanprover-community.github.io/mathlib-overview.html
 	- docs - https://leanprover-community.github.io/mathlib4_docs/index.html
+	- lang + mathlib tutorial - https://leanprover-community.github.io/mathematics_in_lean/index.html
 - theorem proving in Lean - https://leanprover.github.io/theorem_proving_in_lean4/title_page.html
-	- `theorem` vs. `def` - https://leanprover.github.io/theorem_proving_in_lean4/propositions_and_proofs.html#working-with-propositions-as-types
 - theorem-proving tactics
 	- index - https://www.ma.imperial.ac.uk/~buzzard/xena/formalising-mathematics-2024/Part_C/Part_C.html
 	- cheatsheet - https://leanprover-community.github.io/papers/lean-tactics.pdf
 	- reference - https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#tactic-ref
 - coding
 	- tutorial - https://lean-lang.org/functional_programming_in_lean/
+- hard to grok things
+	- type classes - https://lean-lang.org/doc/reference/latest/Type-Classes/#type-classes
+	- `theorem` vs. `def` - https://leanprover.github.io/theorem_proving_in_lean4/propositions_and_proofs.html#working-with-propositions-as-types
