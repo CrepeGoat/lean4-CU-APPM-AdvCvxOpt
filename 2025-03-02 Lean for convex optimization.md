@@ -101,5 +101,6 @@ fix: add `pkgs.gcc` to nix-shell file -> ✅
 - theorem-proving tactics
 	- index - https://www.ma.imperial.ac.uk/~buzzard/xena/formalising-mathematics-2024/Part_C/Part_C.html
 	- cheatsheet - https://leanprover-community.github.io/papers/lean-tactics.pdf
+	- reference - https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#tactic-ref
 - coding
 	- tutorial - https://lean-lang.org/functional_programming_in_lean/

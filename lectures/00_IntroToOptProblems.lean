@@ -15,89 +15,69 @@ uses CvxLean as a reference:
 -/
 
 
-/- Constraint Set -/
-
-structure ConstraintSet (S: Type) where
-    constraints: S -> Prop
-
-namespace ConstraintSet
-
-variable {S: Type}
-variable (c: ConstraintSet S)
-
-/-- A point `x : S` is feasible in `c` if it satisfies the constraints. -/
-@[reducible]
-def feasible (x : S) : Prop := c.constraints x
-
-end ConstraintSet
-
 /- Minimization -/
-structure Minimization (Domain Range: Type) where
-    objectiveFunc: Domain -> Range
-    constraintSet: ConstraintSet Domain
-
-namespace Minimization
-
-variable {D R : Type} [Preorder R]
-variable (p : Minimization D R)
-
-/-- A point `x : D` is optimal in `p` if it is feasible and for any feasible point `y : D` the
-value of `x` is a lower bound to the value of `y`. --/
-@[reducible]
-def optimal (x : D) : Prop :=
-    (p.constraintSet.feasible x) ∧ ∀ y, p.constraintSet.feasible y
-    → p.objectiveFunc x ≤ p.objectiveFunc y
-
-/-- A solution is simply an optimal point. -/
-structure Solution where
-  point : D
-  isOptimal : p.optimal point
-
-end Minimization
-
+structure MinimumOn
+    {Domain: Type u}
+    {Range: Type u} [Preorder Range]
+    (objective: Domain → Range)
+    (ConstraintSet: Set Domain)
+    where
+    value : Range
+    yIsInImage : ∃ x ∈ ConstraintSet, objective x = value
+    isMin: ∀ x ∈ ConstraintSet, value ≤ objective x
 
 /- Maximization -/
-structure Maximization (Domain Range: Type) where
-    objectiveFunc: Domain -> Range
-    constraintSet: ConstraintSet Domain
-
-namespace Maximization
-
-variable {D R : Type} [Preorder R]
-variable (p : Maximization D R)
-
-/-- A point `x : D` is optimal in `p` if it is feasible and for any feasible point `y : D` the
-value of `x` is a lower bound to the value of `y`. --/
-@[reducible]
-def optimal (x : D) : Prop :=
-    (p.constraintSet.feasible x)
-    ∧ ∀ y, p.constraintSet.feasible y → p.objectiveFunc y ≤ p.objectiveFunc x
-
-/-- A solution is simply an optimal point. -/
-structure Solution where
-  point : D
-  isOptimal : p.optimal point
-
-end Maximization
-
+structure MaximumOn
+    {Domain: Type u}
+    {Range: Type u} [Preorder Range]
+    (objective: Domain → Range)
+    (ConstraintSet: Set Domain)
+    where
+    value : Range
+    yIsInImage : ∃ x ∈ ConstraintSet, objective x = value
+    isMax: ∀ x ∈ ConstraintSet, objective x ≤ value
 
 /- Remark -/
-/-- max_x f(x) = -min_x (-f(x)) -/
-theorem max_obj_eq_neg_min_neg_obj
+/-- min_x f(x) = -max_x (-f(x)) -/
+def min_obj_to_neg_max_neg_obj
     {D R : Type} [OrderedAddCommGroup R]
-        -- [InvolutiveNeg R]
-    (min : Minimization D R)
-    (s: min.Solution)
-    : (
-        Maximization.mk
-        (fun x: D => -(min.objectiveFunc x))
-        min.constraintSet
-    ).optimal s.point
+    {f: D → R}
+    {C: Set D}
+    (min: MinimumOn f C)
+    :
+    MaximumOn (fun x: D => -(f x)) C
     := by
         constructor
-        exact s.isOptimal.left
-        choose y
-        choose y_feasible
-        show -min.objectiveFunc y <= -min.objectiveFunc s.point
-        have isLeq := s.isOptimal.right y y_feasible
-        exact neg_le_neg isLeq
+        case value => exact -min.value
+        case yIsInImage =>
+            let ⟨xmin, hx⟩ := min.yIsInImage
+            use xmin
+            rw [neg_inj]
+            exact hx
+        case isMax =>
+            intro x
+            intro xInC
+            have minLeX := min.isMin x xInC
+            exact neg_le_neg minLeX
+
+/-- max_x f(x) = -min_x (-f(x)) -/
+def max_obj_to_neg_min_neg_obj
+    {D R : Type} [OrderedAddCommGroup R]
+    {f: D → R}
+    {C: Set D}
+    (max: MaximumOn f C)
+    :
+    MinimumOn (fun x: D => -(f x)) C
+    := by
+        constructor
+        case value => exact -max.value
+        case yIsInImage =>
+            let ⟨xmax, hx⟩ := max.yIsInImage
+            use xmax
+            rw [neg_inj]
+            exact hx
+        case isMin =>
+            intro x
+            intro xInC
+            have maxGeX := max.isMax x xInC
+            exact neg_le_neg maxGeX
