@@ -13,6 +13,8 @@ import Mathlib.Data.Matrix.Defs
 import Mathlib.Topology.MetricSpace.Defs
 import Mathlib.Data.PNat.Notation
 import Mathlib.Data.Real.ConjExponents
+import Mathlib.Algebra.Group.Defs
+
 
 
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
@@ -81,8 +83,7 @@ def min_obj_to_neg_max_neg_obj
         case isMax =>
             intro x
             intro xInC
-            have minLeX := min.isMin x xInC
-            exact neg_le_neg minLeX
+            exact min.isMin x xInC |> neg_le_neg
 
 /-- max_x f(x) = -min_x (-f(x)) -/
 def max_obj_to_neg_min_neg_obj
@@ -104,8 +105,7 @@ def max_obj_to_neg_min_neg_obj
         case isMin =>
             intro x
             intro xInC
-            have maxGeX := max.isMax x xInC
-            exact neg_le_neg maxGeX
+            exact max.isMax x xInC |> neg_le_neg
 
 /-- y s.t. f(y) = min of f(x) for all x in C -/
 def ArgumentMinimumOn
@@ -118,15 +118,6 @@ def ArgumentMinimumOn
         xmin ∈ ConstraintSet
         ∧ ∀ x ∈ ConstraintSet, objective xmin ≤ objective x
 
-private def is_le_image_on
-    {Domain: Type*}
-    {Range: Type*} [Preorder Range]
-    (objective: Domain → Range)
-    (ConstraintSet: Set Domain)
-    (y : Range)
-    : Prop
-    := ∀ x ∈ ConstraintSet, y ≤ objective x
-
 /-- inf of f(x) for all x in C -/
 structure InfimumOn
     {Domain: Type*}
@@ -135,18 +126,9 @@ structure InfimumOn
     (ConstraintSet: Set Domain)
     where
     value : Range
-    isLtAll : is_le_image_on objective ConstraintSet value
-    isLargestLtAll:
-        ∀ y : Range, is_le_image_on objective ConstraintSet y -> y ≤ value
-
-private def is_ge_image_on
-    {Domain: Type*}
-    {Range: Type*} [Preorder Range]
-    (objective: Domain → Range)
-    (ConstraintSet: Set Domain)
-    (y : Range)
-    : Prop
-    := ∀ x ∈ ConstraintSet, y ≤ objective x
+    isLeAll : ∀ x ∈ ConstraintSet, value ≤ objective x
+    isLargestLeAll:
+        ∀ y : Range, (∀ x ∈ ConstraintSet, y ≤ objective x) -> y ≤ value
 
 /-- sup of f(x) for all x in C -/
 structure SupremumOn
@@ -156,9 +138,34 @@ structure SupremumOn
     (ConstraintSet: Set Domain)
     where
     value : Range
-    isLtAll : is_ge_image_on objective ConstraintSet value
-    isLargestLtAll:
-        ∀ y : Range, is_ge_image_on objective ConstraintSet y -> value ≤ y
+    isGeAll : (∀ x ∈ ConstraintSet, objective x ≤ value)
+    isSmallestGeAll:
+        ∀ y : Range, (∀ x ∈ ConstraintSet, objective x ≤ y) → value ≤ y
+
+/- Remark -/
+/-- inf_x f(x) = -sup_x (-f(x)) -/
+def inf_obj_to_neg_sup_neg_obj
+    {D : Type*}
+    {R : Type*} [OrderedAddCommGroup R]
+    {f: D → R}
+    {C: Set D}
+    (inf: InfimumOn f C)
+    :
+    SupremumOn (fun x: D => -(f x)) C
+    := by
+        constructor
+        case value => exact -inf.value
+        case isGeAll =>
+            intro x
+            intro xInC
+            show -f x ≤ -inf.value
+            exact inf.isLeAll x xInC |> neg_le_neg
+        case isSmallestGeAll =>
+            intro y
+            intro yIsGeNegAll
+            have negYIsLeAll := fun x : D => fun xInC: x ∈ C =>
+                yIsGeNegAll x xInC |> neg_le.mp
+            exact inf.isLargestLeAll (-y) negYIsLeAll |> neg_le.mp
 
 /--
 If a function is L-continuous, any two points that are a distance `d` apart
