@@ -41,71 +41,65 @@ uses CvxLean as a reference:
 
 
 /-- min of f(x) for all x in C -/
-structure MinimumOn
+def MinimumOn
     {Domain: Type*}
-    {Range: Type*} [Preorder Range]
+    {Range: Type*} [LE Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
-    where
-    value : Range
-    yIsInImage : ∃ x ∈ ConstraintSet, objective x = value
-    isMin: ∀ x ∈ ConstraintSet, value ≤ objective x
+    (value : Range)
+    : Prop
+    := Minimal (fun y : Range => y ∈ ConstraintSet.image objective) value
 
 /-- max of f(x) for all x in C -/
-structure MaximumOn
+def MaximumOn
     {Domain: Type*}
-    {Range: Type*} [Preorder Range]
+    {Range: Type*} [LE Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
-    where
-    value : Range
-    yIsInImage : ∃ x ∈ ConstraintSet, objective x = value
-    isMax: ∀ x ∈ ConstraintSet, objective x ≤ value
+    (value : Range)
+    : Prop
+    := Maximal (fun y : Range => y ∈ ConstraintSet.image objective) value
 
 /- Remark -/
-/-- min_x f(x) = -max_x (-f(x)) -/
+/--
+Convert a min expression to a max via the equation:
+
+min_x f(x) = -max_x (-f(x))
+-/
 def min_obj_to_neg_max_neg_obj
     {D : Type*}
     {R : Type*} [OrderedAddCommGroup R]
     {f: D → R}
     {C: Set D}
-    (min: MinimumOn f C)
-    :
-    MaximumOn (fun x: D => -(f x)) C
+    {min : R}
+    (hmin: MinimumOn f C min)
+    : MaximumOn (fun x: D => -(f x)) C (-min)
     := by
         constructor
-        case value => exact -min.value
-        case yIsInImage =>
-            let ⟨xmin, hx⟩ := min.yIsInImage
-            use xmin
-            rw [neg_inj]
-            exact hx
-        case isMax =>
-            intro x
-            intro xInC
-            exact min.isMin x xInC |> neg_le_neg
+        case left => simp; exact hmin.left
+        have hr := hmin.right
+        simp; simp at hr
+        exact hr
 
-/-- max_x f(x) = -min_x (-f(x)) -/
+/--
+Convert a max expression to a min via the equation:
+
+max_x f(x) = -min_x (-f(x))
+-/
 def max_obj_to_neg_min_neg_obj
     {D : Type*}
     {R : Type*} [OrderedAddCommGroup R]
     {f: D → R}
     {C: Set D}
-    (max: MaximumOn f C)
-    :
-    MinimumOn (fun x: D => -(f x)) C
+    {min : R}
+    (hmin: MaximumOn f C min)
+    : MinimumOn (fun x: D => -(f x)) C (-min)
     := by
         constructor
-        case value => exact -max.value
-        case yIsInImage =>
-            let ⟨xmax, hx⟩ := max.yIsInImage
-            use xmax
-            rw [neg_inj]
-            exact hx
-        case isMin =>
-            intro x
-            intro xInC
-            exact max.isMax x xInC |> neg_le_neg
+        case left => simp; exact hmin.left
+        have hr := hmin.right
+        simp; simp at hr
+        exact hr
 
 /-- y s.t. f(y) = min of f(x) for all x in C -/
 def ArgumentMinimumOn
