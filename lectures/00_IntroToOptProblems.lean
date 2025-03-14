@@ -104,7 +104,7 @@ def max_obj_to_neg_min_neg_obj
 /-- y s.t. f(y) = min of f(x) for all x in C -/
 def ArgumentMinimumOn
     {Domain: Type*}
-    {Range: Type*} [Preorder Range]
+    {Range: Type*}  [LE Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
     : Set Domain
@@ -115,7 +115,7 @@ def ArgumentMinimumOn
 /-- inf of f(x) for all x in C -/
 def InfimumOn
     {Domain: Type*}
-    {Range: Type*} [Preorder Range]
+    {Range: Type*} [LE Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
     (value : Range)
@@ -125,7 +125,7 @@ def InfimumOn
 /-- sup of f(x) for all x in C -/
 def SupremumOn
     {Domain: Type*}
-    {Range: Type*} [Preorder Range]
+    {Range: Type*} [LE Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
     (value : Range)
@@ -143,20 +143,16 @@ def inf_obj_to_neg_sup_neg_obj
     {R : Type*} [OrderedAddCommGroup R]
     {f: D → R}
     {C: Set D}
-    (inf: R)
+    {inf: R}
     (hinf: InfimumOn f C inf)
     : SupremumOn (fun x: D => -(f x)) C (-inf)
     := by
         constructor
-        case left =>
-            simp
-            exact hinf.left
+        case left => simp; exact hinf.left
         case right =>
-            intro y
-            intro hNegObjLeY
+            intro y hNegObjLeY h
             have hYLeNegObj := fun x : D => fun hXInC : x ∈ C =>
                 hNegObjLeY x hXInC |> neg_le.mp
-            intro h
             exact hinf.right hYLeNegObj (le_neg.mp h) |> neg_le.mp
 
 /--
@@ -169,20 +165,16 @@ def sup_obj_to_neg_inf_neg_obj
     {R : Type*} [OrderedAddCommGroup R]
     {f: D → R}
     {C: Set D}
-    (sup: R)
+    {sup: R}
     (hsup: SupremumOn f C sup)
     : InfimumOn (fun x: D => -(f x)) C (-sup)
     := by
         constructor
-        case left =>
-            simp
-            exact hsup.left
+        case left => simp; exact hsup.left
         case right =>
-            intro y
-            intro hYLeNegObj
+            intro y hYLeNegObj h
             have hObjLeNegY := fun x : D => fun hXInC : x ∈ C =>
                 hYLeNegObj x hXInC |> le_neg.mp
-            intro h
             exact hsup.right hObjLeNegY (neg_le.mp h) |> le_neg.mp
 
 
@@ -190,13 +182,15 @@ def sup_obj_to_neg_inf_neg_obj
 If a function is L-continuous, any two points that are a distance `d` apart
 are no more than `L * d` apart when mapped through the function.
 -/
-structure LipschitzContinuous
+def lipschitz_continuous
     [Field ℝ] [Lattice ℝ]
     {ℝn : Type*} [NormedAddCommGroup ℝn] [NormedSpace ℝ ℝn]
     (f : ℝn → ℝ)
-    where
-    L : NNReal
-    h : ∀ x y : ℝn, abs ((f y) - (f x)) ≤ L * dist y x
+    (L : NNReal)
+    : Prop
+    := ∀ x y : ℝn, abs ((f y) - (f x)) ≤ L * dist y x
+
+#check lipschitz_continuous (fun x => ![1, 3] ⬝ᵥ x) (3 : NNReal)
 
 
 def Vec
