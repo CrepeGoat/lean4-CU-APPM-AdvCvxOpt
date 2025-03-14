@@ -119,28 +119,24 @@ def ArgumentMinimumOn
         ∧ ∀ x ∈ ConstraintSet, objective xmin ≤ objective x
 
 /-- inf of f(x) for all x in C -/
-structure InfimumOn
+def InfimumOn
     {Domain: Type*}
     {Range: Type*} [Preorder Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
-    where
-    value : Range
-    isLeAll : ∀ x ∈ ConstraintSet, value ≤ objective x
-    isLargestLeAll:
-        ∀ y : Range, (∀ x ∈ ConstraintSet, y ≤ objective x) -> y ≤ value
+    (value : Range)
+    : Prop
+    := Maximal (fun y: Range => ∀ x ∈ ConstraintSet, y ≤ objective x) value
 
 /-- sup of f(x) for all x in C -/
-structure SupremumOn
+def SupremumOn
     {Domain: Type*}
     {Range: Type*} [Preorder Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
-    where
-    value : Range
-    isGeAll : (∀ x ∈ ConstraintSet, objective x ≤ value)
-    isSmallestGeAll:
-        ∀ y : Range, (∀ x ∈ ConstraintSet, objective x ≤ y) → value ≤ y
+    (value : Range)
+    : Prop
+    := Minimal (fun y: Range => ∀ x ∈ ConstraintSet, objective x ≤ y) value
 
 /- Remark -/
 /-- inf_x f(x) = -sup_x (-f(x)) -/
@@ -149,23 +145,22 @@ def inf_obj_to_neg_sup_neg_obj
     {R : Type*} [OrderedAddCommGroup R]
     {f: D → R}
     {C: Set D}
-    (inf: InfimumOn f C)
-    :
-    SupremumOn (fun x: D => -(f x)) C
+    (inf: R)
+    (hinf: InfimumOn f C inf)
+    : SupremumOn (fun x: D => -(f x)) C (-inf)
     := by
         constructor
-        case value => exact -inf.value
-        case isGeAll =>
-            intro x
-            intro xInC
-            show -f x ≤ -inf.value
-            exact inf.isLeAll x xInC |> neg_le_neg
-        case isSmallestGeAll =>
+        case left =>
+            simp
+            exact hinf.left
+        case right =>
             intro y
-            intro yIsGeNegAll
-            have negYIsLeAll := fun x : D => fun xInC: x ∈ C =>
-                yIsGeNegAll x xInC |> neg_le.mp
-            exact inf.isLargestLeAll (-y) negYIsLeAll |> neg_le.mp
+            intro hNegObjLeY
+            have hYLeNegObj := fun x : D => fun hXInC : x ∈ C =>
+                hNegObjLeY x hXInC |> neg_le.mp
+            intro h
+            exact hinf.right hYLeNegObj (le_neg.mp h) |> neg_le.mp
+
 
 /--
 If a function is L-continuous, any two points that are a distance `d` apart
