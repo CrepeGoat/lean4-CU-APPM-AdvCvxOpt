@@ -139,7 +139,11 @@ def SupremumOn
     := Minimal (fun y: Range => ∀ x ∈ ConstraintSet, objective x ≤ y) value
 
 /- Remark -/
-/-- inf_x f(x) = -sup_x (-f(x)) -/
+/--
+Convert an inf expression to a sup via the equation:
+
+inf_x f(x) = -sup_x (-f(x))
+-/
 def inf_obj_to_neg_sup_neg_obj
     {D : Type*}
     {R : Type*} [OrderedAddCommGroup R]
@@ -160,6 +164,32 @@ def inf_obj_to_neg_sup_neg_obj
                 hNegObjLeY x hXInC |> neg_le.mp
             intro h
             exact hinf.right hYLeNegObj (le_neg.mp h) |> neg_le.mp
+
+/--
+Convert a sup expression to an inf via the equation:
+
+sup_x f(x) = -inf_x (-f(x))
+-/
+def sup_obj_to_neg_inf_neg_obj
+    {D : Type*}
+    {R : Type*} [OrderedAddCommGroup R]
+    {f: D → R}
+    {C: Set D}
+    (sup: R)
+    (hsup: SupremumOn f C sup)
+    : InfimumOn (fun x: D => -(f x)) C (-sup)
+    := by
+        constructor
+        case left =>
+            simp
+            exact hsup.left
+        case right =>
+            intro y
+            intro hYLeNegObj
+            have hObjLeNegY := fun x : D => fun hXInC : x ∈ C =>
+                hYLeNegObj x hXInC |> le_neg.mp
+            intro h
+            exact hsup.right hObjLeNegY (neg_le.mp h) |> le_neg.mp
 
 
 /--
