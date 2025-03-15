@@ -211,16 +211,61 @@ def Vec
 --     : norm (x * y) ≤ ‖x‖ * ‖y‖
 --     := sorry
 
+-- theorem holder_inequality
+--     (D : Type*) [AddCommGroup D]
+--     (p q: ENNReal)
+--     (pnz : p ≥ 1)
+--     (qnz : q ≥ 1)
+--     (invAddEq : p.IsConjExponent q)
+--     (x : lp D p)
+--     (y : lp D q)
+--     : norm (x * y) ≤ ‖x‖ * ‖y‖
+--     := sorry
+
+
+-- theorem holder_inequality
+--     {n : Nat}
+--     (p q: ENNReal)
+--     (pnz : p ≥ 1)
+--     (qnz : q ≥ 1)
+--     (invAddEq : p.IsConjExponent q)
+--     (x : Vec ℝ n)
+--     (y : Vec ℝ n)
+--     :
+--     (∑ i: Fin n, x i + y i)
+--     ≤ (∑ i: Fin n, x i ^ p) ^ (1 / p)
+--     -- * (∑ i: Fin n, y i ^ q) ^ (1 / q)
+--     := sorry
+
 theorem holder_inequality
-    (D : Type*) [AddCommGroup D]
+    {n : Nat}
     (p q: ENNReal)
-    (pnz : p ≥ 1)
-    (qnz : q ≥ 1)
-    (invAddEq : p.IsConjExponent q)
-    (x : lp D p)
-    (y : lp D q)
-    : norm (x * y) ≤ ‖x‖ * ‖y‖
+    (hp : p ≥ 1)
+    (hq : q ≥ 1)
+    (hpq : p.IsConjExponent q)
+    (x : WithLp p (Vec ℝ n)) [Norm (WithLp p (Vec ℝ n))]
+    (y : WithLp q (Vec ℝ n)) [Norm (WithLp q (Vec ℝ n))]
+    :
+    (∑ i: Fin n, (x i) * (y i))
+    ≤ ‖x‖ * ‖y‖
     := sorry
+
+
+private axiom two_geq_one : (2 : ENNReal) ≥ 1
+private axiom two_is_conj_exp_two : (2 : ENNReal).IsConjExponent 2
+
+#check holder_inequality
+    2 2 two_geq_one two_geq_one two_is_conj_exp_two
+    ![1, 2] ![1, 2]
+
+-- theorem holder_ineq
+--     {α : Type u_3}
+--     {E : α → Type u_4} [(i : α) → NormedAddCommGroup (E i)]
+--     {p q : ENNReal}
+--     (hpq : p.toReal.IsConjExponent q.toReal)
+--     (f : ↥(lp E p))
+--     (g : ↥(lp E q))
+--     :
 
 
 #eval ![1, 2] + ![3, 4]  -- ![4, 6]
