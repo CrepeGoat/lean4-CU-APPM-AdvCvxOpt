@@ -47,47 +47,6 @@ def MaximumOn
     : Prop
     := Maximal (fun y : Range => y ∈ ConstraintSet.image objective) value
 
-/- Remark -/
-/--
-Convert a min expression to a max via the equation:
-
-min_x f(x) = -max_x (-f(x))
--/
-def min_obj_to_neg_max_neg_obj
-    {D : Type*}
-    {R : Type*} [OrderedAddCommGroup R]
-    {f: D → R}
-    {C: Set D}
-    {min : R}
-    (hmin: MinimumOn f C min)
-    : MaximumOn (fun x: D => -(f x)) C (-min)
-    := by
-        constructor
-        case left => simp; exact hmin.left
-        have hr := hmin.right
-        simp; simp at hr
-        exact hr
-
-/--
-Convert a max expression to a min via the equation:
-
-max_x f(x) = -min_x (-f(x))
--/
-def max_obj_to_neg_min_neg_obj
-    {D : Type*}
-    {R : Type*} [OrderedAddCommGroup R]
-    {f: D → R}
-    {C: Set D}
-    {min : R}
-    (hmin: MaximumOn f C min)
-    : MinimumOn (fun x: D => -(f x)) C (-min)
-    := by
-        constructor
-        case left => simp; exact hmin.left
-        have hr := hmin.right
-        simp; simp at hr
-        exact hr
-
 /-- y s.t. f(y) = min of f(x) for all x in C -/
 def ArgumentMinimumOn
     {Domain: Type*}
@@ -97,7 +56,18 @@ def ArgumentMinimumOn
     : Set Domain
     := setOf fun xmin: Domain =>
         xmin ∈ ConstraintSet
-        ∧ ∀ x ∈ ConstraintSet, objective xmin ≤ objective x
+        ∧ MinimumOn objective ConstraintSet (objective xmin)
+
+/-- y s.t. f(y) = max of f(x) for all x in C -/
+def ArgumentMaximumOn
+    {Domain: Type*}
+    {Range: Type*}  [LE Range]
+    (objective: Domain → Range)
+    (ConstraintSet: Set Domain)
+    : Set Domain
+    := setOf fun xmax: Domain =>
+        xmax ∈ ConstraintSet
+        ∧ MaximumOn objective ConstraintSet (objective xmax)
 
 /-- inf of f(x) for all x in C -/
 def InfimumOn
@@ -118,52 +88,6 @@ def SupremumOn
     (value : Range)
     : Prop
     := Minimal (fun y: Range => ∀ x ∈ ConstraintSet, objective x ≤ y) value
-
-/- Remark -/
-/--
-Convert an inf expression to a sup via the equation:
-
-inf_x f(x) = -sup_x (-f(x))
--/
-def inf_obj_to_neg_sup_neg_obj
-    {D : Type*}
-    {R : Type*} [OrderedAddCommGroup R]
-    {f: D → R}
-    {C: Set D}
-    {inf: R}
-    (hinf: InfimumOn f C inf)
-    : SupremumOn (fun x: D => -(f x)) C (-inf)
-    := by
-        constructor
-        case left => simp; exact hinf.left
-        case right =>
-            intro y hNegObjLeY h
-            have hYLeNegObj := fun x : D => fun hXInC : x ∈ C =>
-                hNegObjLeY x hXInC |> neg_le.mp
-            exact hinf.right hYLeNegObj (le_neg.mp h) |> neg_le.mp
-
-/--
-Convert a sup expression to an inf via the equation:
-
-sup_x f(x) = -inf_x (-f(x))
--/
-def sup_obj_to_neg_inf_neg_obj
-    {D : Type*}
-    {R : Type*} [OrderedAddCommGroup R]
-    {f: D → R}
-    {C: Set D}
-    {sup: R}
-    (hsup: SupremumOn f C sup)
-    : InfimumOn (fun x: D => -(f x)) C (-sup)
-    := by
-        constructor
-        case left => simp; exact hsup.left
-        case right =>
-            intro y hYLeNegObj h
-            have hObjLeNegY := fun x : D => fun hXInC : x ∈ C =>
-                hYLeNegObj x hXInC |> le_neg.mp
-            exact hsup.right hObjLeNegY (neg_le.mp h) |> le_neg.mp
-
 
 /--
 If a function is L-continuous, any two points that are a distance `d` apart
