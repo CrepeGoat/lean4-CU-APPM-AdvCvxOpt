@@ -14,20 +14,7 @@ import Mathlib.Topology.MetricSpace.Defs
 import Mathlib.Data.PNat.Notation
 import Mathlib.Data.Real.ConjExponents
 import Mathlib.Algebra.Group.Defs
-
-
-
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
--- import Mathlib.LinearAlgebra.Eigenspace.Minpoly
--- import Mathlib.LinearAlgebra.Charpoly.Basic
--- import Mathlib.Data.Complex.FiniteDimensional
-
--- import Mathlib.Tactic
--- import Mathlib.Util.Delaborators
-
--- set_option warningAsError false
-
--- https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Order/Group/Defs.html#neg_le_neg
 
 /-!
 
