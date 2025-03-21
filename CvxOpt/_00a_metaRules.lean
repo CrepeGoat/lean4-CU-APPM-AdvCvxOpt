@@ -43,48 +43,6 @@ def max_obj_to_neg_min_neg_obj
         exact hr
 
 /--
-Convert an argmin expression to an argmax via the equation:
-
-argmin_x f(x) = argmax_x (-f(x))
--/
-def argmin_obj_to_argmax_neg_obj
-    {D : Type*} [Neg D]
-    {R : Type*} [OrderedAddCommGroup R]
-    {f: D → R}
-    {C: Set D}
-    (hargmin: ArgumentMinimumOn f C)
-    : ArgumentMaximumOn (fun x: D => -(f x)) C
-    := by
-        constructor
-        case val => exact hargmin.val
-        case property =>
-            constructor
-            case left => exact hargmin.property.left
-            case right => exact min_obj_to_neg_max_neg_obj hargmin.property.right
-
-
-/--
-Convert an argmax expression to an argmin via the equation:
-
-argmax_x f(x) = argmin_x (-f(x))
--/
-def argmax_obj_to_argmin_neg_obj
-    {D : Type*} [Neg D]
-    {R : Type*} [OrderedAddCommGroup R]
-    {f: D → R}
-    {C: Set D}
-    (hargmax: ArgumentMaximumOn f C)
-    : ArgumentMinimumOn (fun x: D => -(f x)) C
-    := by
-        constructor
-        case val => exact hargmax.val
-        case property =>
-            constructor
-            case left => exact hargmax.property.left
-            case right => exact max_obj_to_neg_min_neg_obj hargmax.property.right
-
-
-/--
 Convert an inf expression to a sup via the equation:
 
 inf_x f(x) = -sup_x (-f(x))
@@ -127,3 +85,44 @@ def sup_obj_to_neg_inf_neg_obj
             have hObjLeNegY := fun x : D => fun hXInC : x ∈ C =>
                 hYLeNegObj x hXInC |> le_neg.mp
             exact hsup.right hObjLeNegY (neg_le.mp h) |> le_neg.mp
+
+/--
+Convert an argmin expression to an argmax via the equation:
+
+argmin_x f(x) = argmax_x (-f(x))
+-/
+def argmin_obj_to_argmax_neg_obj
+    {D : Type*} [Neg D]
+    {R : Type*} [OrderedAddCommGroup R]
+    {f: D → R}
+    {C: Set D}
+    (hargmin: ArgumentMinimumOn f C)
+    : ArgumentMaximumOn (fun x: D => -(f x)) C
+    := by
+        constructor
+        case val => exact hargmin.val
+        case property =>
+            constructor
+            case left => exact hargmin.property.left
+            case right => exact min_obj_to_neg_max_neg_obj hargmin.property.right
+
+
+/--
+Convert an argmax expression to an argmin via the equation:
+
+argmax_x f(x) = argmin_x (-f(x))
+-/
+def argmax_obj_to_argmin_neg_obj
+    {D : Type*} [Neg D]
+    {R : Type*} [OrderedAddCommGroup R]
+    {f: D → R}
+    {C: Set D}
+    (hargmax: ArgumentMaximumOn f C)
+    : ArgumentMinimumOn (fun x: D => -(f x)) C
+    := by
+        constructor
+        case val => exact hargmax.val
+        case property =>
+            constructor
+            case left => exact hargmax.property.left
+            case right => exact max_obj_to_neg_min_neg_obj hargmax.property.right
