@@ -15,12 +15,12 @@ $$
 \min_x f(x) = -\max_x (-f(x))
 $$
 -/
-def min_obj_to_neg_max_neg_obj
+theorem min_obj_to_neg_max_neg_obj
     [OrderedAddCommGroup R]
     {min : R}
-    (hmin: MinimumOn f C min)
-    : MaximumOn (fun x: D => -(f x)) C (-min)
+    : MinimumOn f C min → MaximumOn (fun x: D => -(f x)) C (-min)
     := by
+        intro hmin
         constructor
         case left => simp; exact hmin.left
         have hr := hmin.right
@@ -34,15 +34,15 @@ $$
 \max_x f(x) = -\min_x (-f(x))
 $$
 -/
-def max_obj_to_neg_min_neg_obj
+theorem max_obj_to_neg_min_neg_obj
     [OrderedAddCommGroup R]
     {min : R}
-    (hmin: MaximumOn f C min)
-    : MinimumOn (fun x: D => -(f x)) C (-min)
+    : MaximumOn f C min → MinimumOn (fun x: D => -(f x)) C (-min)
     := by
+        intro hmax
         constructor
-        case left => simp; exact hmin.left
-        have hr := hmin.right
+        case left => simp; exact hmax.left
+        have hr := hmax.right
         simp; simp at hr
         exact hr
 
@@ -56,9 +56,9 @@ $$
 def inf_obj_to_neg_sup_neg_obj
     [OrderedAddCommGroup R]
     {inf: R}
-    (hinf: InfimumOn f C inf)
-    : SupremumOn (fun x: D => -(f x)) C (-inf)
+    : InfimumOn f C inf → SupremumOn (fun x: D => -(f x)) C (-inf)
     := by
+        intro hinf
         constructor
         case left => simp; exact hinf.left
         case right =>
@@ -74,12 +74,12 @@ $$
 \sup_x f(x) = -\inf_x (-f(x))
 $$
 -/
-def sup_obj_to_neg_inf_neg_obj
+theorem sup_obj_to_neg_inf_neg_obj
     [OrderedAddCommGroup R]
     {sup: R}
-    (hsup: SupremumOn f C sup)
-    : InfimumOn (fun x: D => -(f x)) C (-sup)
+    : SupremumOn f C sup → InfimumOn (fun x: D => -(f x)) C (-sup)
     := by
+        intro hsup
         constructor
         case left => simp; exact hsup.left
         case right =>
@@ -95,18 +95,14 @@ $$
 \text{argmin}_x f(x) = \text{argmax}_x (-f(x))
 $$
 -/
-def argmin_obj_to_argmax_neg_obj
-    [Neg D]
+theorem argmin_obj_to_argmax_neg_obj
     [OrderedAddCommGroup R]
-    (hargmin: ArgumentMinimumOn f C)
-    : ArgumentMaximumOn (fun x: D => -(f x)) C
+    : ArgumentMinimumOn f C = ArgumentMaximumOn (fun x: D => -(f x)) C
     := by
-        constructor
-        case val => exact hargmin.val
-        case property =>
-            constructor
-            case left => exact hargmin.property.left
-            case right => exact min_obj_to_neg_max_neg_obj hargmin.property.right
+        unfold ArgumentMinimumOn ArgumentMaximumOn
+        unfold MinimumOn MaximumOn
+        unfold Minimal Maximal
+        simp
 
 /--
 Convert an argmax expression to an argmin via the equation:
@@ -115,17 +111,13 @@ $$
 \text{argmax}_x f(x) = \text{argmin}_x (-f(x))
 $$
 -/
-def argmax_obj_to_argmin_neg_obj
-    [Neg D]
+theorem argmax_obj_to_argmin_neg_obj
     [OrderedAddCommGroup R]
-    (hargmax: ArgumentMaximumOn f C)
-    : ArgumentMinimumOn (fun x: D => -(f x)) C
+    : ArgumentMaximumOn f C = ArgumentMinimumOn (fun x: D => -(f x)) C
     := by
-        constructor
-        case val => exact hargmax.val
-        case property =>
-            constructor
-            case left => exact hargmax.property.left
-            case right => exact max_obj_to_neg_min_neg_obj hargmax.property.right
+        unfold ArgumentMinimumOn ArgumentMaximumOn
+        unfold MinimumOn MaximumOn
+        unfold Minimal Maximal
+        simp
 
 end meta_rules

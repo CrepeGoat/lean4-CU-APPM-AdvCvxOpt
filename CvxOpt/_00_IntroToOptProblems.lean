@@ -50,7 +50,7 @@ def MaximumOn
 /-- y s.t. f(y) = min of f(x) for all x in C -/
 def ArgumentMinimumOn
     {Domain: Type*}
-    {Range: Type*}  [LE Range]
+    {Range: Type*} [LE Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
     : Set Domain
@@ -61,7 +61,7 @@ def ArgumentMinimumOn
 /-- y s.t. f(y) = max of f(x) for all x in C -/
 def ArgumentMaximumOn
     {Domain: Type*}
-    {Range: Type*}  [LE Range]
+    {Range: Type*} [LE Range]
     (objective: Domain → Range)
     (ConstraintSet: Set Domain)
     : Set Domain
