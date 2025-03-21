@@ -120,4 +120,69 @@ theorem argmax_obj_to_argmin_neg_obj
         unfold Minimal Maximal
         simp
 
-end meta_rules
+/-
+Minimizing over an increasing function φ does not affect the optimal points:
+
+$$
+\text{argmin}_x f(x) = \text{argmin}_x φ(f(x))
+$$
+-/
+theorem argmin_obj_eq_argmin_increasing_comp_obj
+    [OrderedAddCommGroup R]
+    (φ : R → R)
+    (hφ : StrictMonoOn φ (C.image f))
+    : ArgumentMinimumOn f C = ArgumentMinimumOn (fun x => x |> f |> φ) C
+    := by
+        unfold ArgumentMinimumOn
+        unfold MinimumOn
+        unfold Minimal
+        simp
+        unfold StrictMonoOn at hφ
+        simp at hφ
+        sorry
+
+/-
+Minimizing over a non-decreasing function φ allows for additional optimal points:
+
+$$
+\text{argmin}_x f(x) ⊆ \text{argmin}_x φ(f(x))
+$$
+-/
+theorem argmin_obj_subset_argmin_non_decreasing_comp_obj
+    [LinearOrder R]
+    (φ : R → R)
+    (hφ : MonotoneOn φ (C.image f))
+    : ArgumentMinimumOn f C ⊆ ArgumentMinimumOn (fun x => x |> f |> φ) C
+    := by
+        unfold ArgumentMinimumOn
+        unfold MinimumOn
+        unfold Minimal
+        simp
+        constructor
+        case left =>
+            intro x1
+            simp
+            intro hX1InC x2 hX2InC hFEq hX1InC hLeF1ThenF1Le
+            constructor
+            case left => exact hX1InC
+            exists x2
+            constructor
+            case right.left => exact hX2InC
+            rewrite [hFEq]
+            rfl
+        case right =>
+            intro x1
+            simp
+            intro hX1InC x2 hX2InC hFEq hX1InC hLeF1ThenF1Le
+            constructor
+            case left => exact hX1InC
+            intro x3 hX3InC hφ3Leφ1
+            induction (hφ3Leφ1 |> le_iff_eq_or_lt.mp)
+            case right.inl hφ3Eqφ1 => exact hφ3Eqφ1.symm |> Or.inl |> le_iff_eq_or_lt.mpr
+            case right.inr hφ3Ltφ1 =>
+            have hF1InFC : (f x1 ∈ C.image f) := by exists x1
+            have hF3InFC : (f x3 ∈ C.image f) := by exists x3
+            exact MonotoneOn.reflect_lt hφ hF3InFC hF1InFC hφ3Ltφ1
+                |> Or.inr |> le_iff_eq_or_lt.mpr
+                |> hLeF1ThenF1Le x3 hX3InC
+                |> hφ hF1InFC hF3InFC
