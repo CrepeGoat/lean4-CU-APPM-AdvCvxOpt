@@ -1,3 +1,8 @@
+
+# 2025/03/19 lessons
+- `ring` is great; just need to first remove divisions with things like `eq_div_iff` and `add_div'`
+- other cool tactics - `linarith`, `field_simp`
+- search through mathlib content - https://leansearch.net/ 
 # 2025/03/11 vectors?
 - example of vectors
 	- docs w/ example code - https://leanprover-community.github.io/mathematics_in_lean/C09_Linear_Algebra.html#matrices
@@ -106,11 +111,13 @@ fix: add `pkgs.gcc` to nix-shell file -> ✅
 	- index - https://leanprover-community.github.io/mathlib-overview.html
 	- docs - https://leanprover-community.github.io/mathlib4_docs/index.html
 	- lang + mathlib tutorial - https://leanprover-community.github.io/mathematics_in_lean/index.html
+	- search - https://leansearch.net/
 - theorem proving in Lean - https://leanprover.github.io/theorem_proving_in_lean4/title_page.html
-- theorem-proving tactics
+- tactics
 	- index - https://www.ma.imperial.ac.uk/~buzzard/xena/formalising-mathematics-2024/Part_C/Part_C.html
 	- cheatsheet - https://leanprover-community.github.io/papers/lean-tactics.pdf
 	- reference - https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#tactic-ref
+	- curated list of most useful - https://github.com/madvorak/lean4-tactics
 - coding
 	- tutorial - https://lean-lang.org/functional_programming_in_lean/
 - hard to grok things
