@@ -234,7 +234,22 @@ theorem subset_then_min_le_min
     (min2 : MinimumOn f C2 fmin2)
     : C ⊆ C2 → fmin2 ≤ fmin
     := by
-    sorry
+    simp [MinimumOn, Minimal] at min
+    simp [MinimumOn, Minimal] at min2
+
+    intro hsubset; rw [Set.subset_def] at hsubset
+    induction le_or_lt fmin2 fmin
+    case inl h => exact h
+    case inr hFMinLtFMin2 =>
+
+    rw [← min.left.choose_spec.right]
+    apply min2.right
+    case a => exact hsubset min.left.choose min.left.choose_spec.left
+    case a =>
+    rw [le_iff_eq_or_lt]
+    apply Or.inr
+    rw [min.left.choose_spec.right]
+    exact hFMinLtFMin2
 
 /- Rule 3 -/
 
