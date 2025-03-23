@@ -222,3 +222,66 @@ theorem argmin_obj_eq_argmin_increasing_comp_obj
         rw [le_iff_eq_or_lt]
         apply Or.inr
         exact hφ hF3InFC hF1InFC hF3LtF1
+
+/- Rule 2 -/
+
+theorem subset_then_min_le_min
+    [LinearOrder R]
+    {fmin : R}
+    {C2 : Set D}
+    {fmin2 : R}
+    (min : MinimumOn f C fmin)
+    (min2 : MinimumOn f C2 fmin2)
+    : C ⊆ C2 → fmin2 ≤ fmin
+    := by
+    sorry
+
+/- Rule 3 -/
+
+theorem sum_min_le_min_sum
+    [LinearOrderedField R]
+    {g : D → R}
+    {fmin : R}
+    {gmin : R}
+    {fgmin : R}
+    (minF : MinimumOn f C fmin)
+    (minG : MinimumOn g C gmin)
+    (minFG : MinimumOn (fun x => f x + g x) C fgmin)
+    : fmin + gmin ≤ fgmin
+    := by
+    sorry
+
+/- Rule 4 -/
+
+theorem min_comm'
+    [LE R]
+    {D2 : Type*}
+    {C2 : Set D2}
+    {f : D → D2 → R}
+    {fxmin : D2 → R}
+    {hfxmin : ∀ y ∈ C2, MinimumOn (fun x => f x y) C (fxmin y)}
+    {fymin : D → R}
+    {hfymin : ∀ x ∈ C, MinimumOn (fun y => f x y) C2 (fymin x)}
+    {fmin : R}
+    : MinimumOn fxmin C2 fmin ↔ MinimumOn fymin C fmin
+    := by
+    sorry
+
+theorem saddle_point_inequality
+    [LE R]
+    {D2 : Type*}
+    {C2 : Set D2}
+    {f : D → D2 → R}
+    {fxmax : D2 → R}
+    {hfxmax : ∀ y ∈ C2, MaximumOn (fun x => f x y) C (fxmax y)}
+    {fymin : D → R}
+    {hfymin : ∀ x ∈ C, MinimumOn (fun y => f x y) C2 (fymin x)}
+    {fminmax : R}
+    {hfminmax : MinimumOn fxmax C2 fminmax}
+    {fmaxmin : R}
+    {hfmaxmin : MaximumOn fxmin C fmaxmin}
+    : fmaxmin ≤ fminmax
+    := by
+    sorry
+
+end meta_rules

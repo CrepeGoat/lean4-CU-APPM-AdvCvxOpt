@@ -26,6 +26,7 @@ uses CvxLean as a reference:
 
 -/
 
+section intro_to_opt_problems
 
 /-- min of f(x) for all x in C -/
 def MinimumOn
@@ -129,3 +130,5 @@ def epsilon_optimal
     (epsilon : R)
     : Prop
     := obj value - min ≤ epsilon
+
+end intro_to_opt_problems
