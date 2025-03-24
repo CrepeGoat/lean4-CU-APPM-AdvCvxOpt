@@ -264,7 +264,30 @@ theorem sum_min_le_min_sum
     (minFG : MinimumOn (fun x => f x + g x) C fgmin)
     : fmin + gmin ≤ fgmin
     := by
-    sorry
+    simp [MinimumOn, Minimal] at minF
+    simp [MinimumOn, Minimal] at minG
+    simp [MinimumOn, Minimal] at minFG
+
+    rw [← minFG.left.choose_spec.right]
+    apply add_le_add
+    case h₁ =>
+        have hF := minF.right minFG.left.choose minFG.left.choose_spec.left
+        induction le_or_lt fmin (f minFG.left.choose) with
+        | inl h => exact h
+        | inr h =>
+            exact h
+                |> Or.inr
+                |> le_iff_eq_or_lt.mpr
+                |> minF.right minFG.left.choose minFG.left.choose_spec.left
+    case h₂ =>
+        have hG := minG.right minFG.left.choose minFG.left.choose_spec.left
+        induction le_or_lt gmin (g minFG.left.choose) with
+        | inl h => exact h
+        | inr h =>
+            exact h
+                |> Or.inr
+                |> le_iff_eq_or_lt.mpr
+                |> minG.right minFG.left.choose minFG.left.choose_spec.left
 
 /- Rule 4 -/
 
