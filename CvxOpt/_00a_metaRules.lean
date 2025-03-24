@@ -23,8 +23,9 @@ theorem min_obj_to_neg_max_neg_obj
         intro hmin
         constructor
         case left => simp; exact hmin.left
+        simp [upperBounds]
         have hr := hmin.right
-        simp; simp at hr
+        simp [lowerBounds] at hr
         exact hr
 
 /--
@@ -42,8 +43,9 @@ theorem max_obj_to_neg_min_neg_obj
         intro hmax
         constructor
         case left => simp; exact hmax.left
+        simp [lowerBounds]
         have hr := hmax.right
-        simp; simp at hr
+        simp [upperBounds] at hr
         exact hr
 
 /--
@@ -53,20 +55,28 @@ $$
 \inf_x f(x) = -\sup_x (-f(x))
 $$
 -/
-def inf_obj_to_neg_sup_neg_obj
+theorem inf_obj_to_neg_sup_neg_obj
     [OrderedAddCommGroup R]
     {inf: R}
     : InfimumOn f C inf → SupremumOn (fun x: D => -(f x)) C (-inf)
     := by
         intro hinf
         constructor
-        case left => simp; exact hinf.left
+        case left =>
+            simp [upperBounds]
+            have hinfl := hinf.left
+            simp [lowerBounds] at hinfl
+            exact hinfl
         case right =>
-            intro y hNegObjLeY h
-            have hYLeNegObj := fun x : D => fun hXInC : x ∈ C =>
-                hNegObjLeY x hXInC |> neg_le.mp
-            exact hinf.right hYLeNegObj (le_neg.mp h) |> neg_le.mp
-
+            simp [upperBounds, lowerBounds]
+            intro y hNegObjLeY
+            have hinfr := hinf.right
+            simp [upperBounds, lowerBounds] at hinfr
+            rw [neg_le]
+            apply hinfr
+            intro x hXInC
+            rw [neg_le]
+            exact hNegObjLeY x hXInC
 /--
 Convert a sup expression to an inf via the equation:
 
@@ -81,12 +91,21 @@ theorem sup_obj_to_neg_inf_neg_obj
     := by
         intro hsup
         constructor
-        case left => simp; exact hsup.left
+        case left =>
+            simp [lowerBounds]
+            have hsupl := hsup.left
+            simp [upperBounds] at hsupl
+            exact hsupl
         case right =>
-            intro y hYLeNegObj h
-            have hObjLeNegY := fun x : D => fun hXInC : x ∈ C =>
-                hYLeNegObj x hXInC |> le_neg.mp
-            exact hsup.right hObjLeNegY (neg_le.mp h) |> le_neg.mp
+            simp [upperBounds, lowerBounds]
+            intro y hYLeNegObj
+            have hsupr := hsup.right
+            simp [upperBounds, lowerBounds] at hsupr
+            rw [le_neg]
+            apply hsupr
+            intro x hXInC
+            rw [le_neg]
+            exact hYLeNegObj x hXInC
 
 /--
 Convert an argmin expression to an argmax via the equation:
@@ -101,7 +120,8 @@ theorem argmin_obj_to_argmax_neg_obj
     := by
         unfold ArgumentMinimumOn ArgumentMaximumOn
         unfold MinimumOn MaximumOn
-        unfold Minimal Maximal
+        unfold IsLeast IsGreatest
+        unfold lowerBounds upperBounds
         simp
 
 /--
@@ -117,7 +137,8 @@ theorem argmax_obj_to_argmin_neg_obj
     := by
         unfold ArgumentMinimumOn ArgumentMaximumOn
         unfold MinimumOn MaximumOn
-        unfold Minimal Maximal
+        unfold IsLeast IsGreatest
+        unfold lowerBounds upperBounds
         simp
 
 /-
@@ -135,7 +156,8 @@ theorem argmin_obj_subset_argmin_non_decreasing_comp_obj
     := by
         unfold ArgumentMinimumOn
         unfold MinimumOn
-        unfold Minimal
+        unfold IsLeast
+        unfold lowerBounds
         simp
 
         constructor
@@ -157,18 +179,13 @@ theorem argmin_obj_subset_argmin_non_decreasing_comp_obj
         intro hX1InC x2 hX2InC hFEq hX1InC hLeF1ThenF1Le
         constructor
         case left => exact hX1InC
-        intro x3 hX3InC hφ3Leφ1
-        induction (hφ3Leφ1 |> le_iff_eq_or_lt.mp)
-        case right.inl hφ3Eqφ1 => rw [hφ3Eqφ1]
-        case right.inr hφ3Ltφ1 =>
-
-        have hF1InFC : (f x1 ∈ C.image f) := by exists x1
-        have hF3InFC : (f x3 ∈ C.image f) := by exists x3
-        apply hφ hF1InFC hF3InFC
-        apply hLeF1ThenF1Le x3 hX3InC
-        rw [le_iff_eq_or_lt]
-        apply Or.inr
-        exact hφ.reflect_lt hF3InFC hF1InFC hφ3Ltφ1
+        case right =>
+        intro x3 hX3InC
+        apply hφ
+        exists x1
+        exists x3
+        apply hLeF1ThenF1Le
+        exact hX3InC
 
 /-
 Minimizing over an increasing function φ does not affect the optimal points:
@@ -190,7 +207,8 @@ theorem argmin_obj_eq_argmin_increasing_comp_obj
 
         unfold ArgumentMinimumOn
         unfold MinimumOn
-        unfold Minimal
+        unfold IsLeast
+        unfold lowerBounds
         simp
 
         constructor
@@ -210,18 +228,11 @@ theorem argmin_obj_eq_argmin_increasing_comp_obj
         case left => exact hX1InC
         case right =>
 
-        intro x3 hX3InC hF3LeF1
-        induction (hF3LeF1 |> le_iff_eq_or_lt.mp)
-        case inl hF3EqF1 => rw [hF3EqF1]
-        case inr hF3LtF1 =>
-
-        have hF1InFC : (f x1 ∈ C.image f) := by exists x1
-        have hF3InFC : (f x3 ∈ C.image f) := by exists x3
-        rw [← hφ.le_iff_le hF1InFC hF3InFC]
-        apply hLeφ1Thenφ1Le x3 hX3InC
-        rw [le_iff_eq_or_lt]
-        apply Or.inr
-        exact hφ hF3InFC hF1InFC hF3LtF1
+        intro x3 hX3InC
+        rw [← hφ.le_iff_le]
+        case ha => exists x1
+        case hb => exists x3
+        exact hLeφ1Thenφ1Le x3 hX3InC
 
 /- Rule 2 -/
 
@@ -234,8 +245,8 @@ theorem subset_then_min_le_min
     (min2 : MinimumOn f C2 fmin2)
     : C ⊆ C2 → fmin2 ≤ fmin
     := by
-    simp [MinimumOn, Minimal] at min
-    simp [MinimumOn, Minimal] at min2
+    simp [MinimumOn, IsLeast, lowerBounds] at min
+    simp [MinimumOn, IsLeast, lowerBounds] at min2
 
     intro hsubset; rw [Set.subset_def] at hsubset
     induction le_or_lt fmin2 fmin
@@ -244,12 +255,8 @@ theorem subset_then_min_le_min
 
     rw [← min.left.choose_spec.right]
     apply min2.right
-    case a => exact hsubset min.left.choose min.left.choose_spec.left
-    case a =>
-    rw [le_iff_eq_or_lt]
-    apply Or.inr
-    rw [min.left.choose_spec.right]
-    exact hFMinLtFMin2
+    apply hsubset
+    exact min.left.choose_spec.left
 
 /- Rule 3 -/
 
@@ -264,30 +271,20 @@ theorem sum_min_le_min_sum
     (minFG : MinimumOn (fun x => f x + g x) C fgmin)
     : fmin + gmin ≤ fgmin
     := by
-    simp [MinimumOn, Minimal] at minF
-    simp [MinimumOn, Minimal] at minG
-    simp [MinimumOn, Minimal] at minFG
+    simp [MinimumOn, IsLeast, lowerBounds] at minF
+    simp [MinimumOn, IsLeast, lowerBounds] at minG
+    simp [MinimumOn, IsLeast, lowerBounds] at minFG
 
     rw [← minFG.left.choose_spec.right]
     apply add_le_add
     case h₁ =>
-        have hF := minF.right minFG.left.choose minFG.left.choose_spec.left
         induction le_or_lt fmin (f minFG.left.choose) with
         | inl h => exact h
-        | inr h =>
-            exact h
-                |> Or.inr
-                |> le_iff_eq_or_lt.mpr
-                |> minF.right minFG.left.choose minFG.left.choose_spec.left
+        | inr h => exact minF.right minFG.left.choose minFG.left.choose_spec.left
     case h₂ =>
-        have hG := minG.right minFG.left.choose minFG.left.choose_spec.left
         induction le_or_lt gmin (g minFG.left.choose) with
         | inl h => exact h
-        | inr h =>
-            exact h
-                |> Or.inr
-                |> le_iff_eq_or_lt.mpr
-                |> minG.right minFG.left.choose minFG.left.choose_spec.left
+        | inr h => exact minG.right minFG.left.choose minFG.left.choose_spec.left
 
 /- Rule 4 -/
 

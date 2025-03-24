@@ -36,7 +36,7 @@ def MinimumOn
     (ConstraintSet: Set Domain)
     (value : Range)
     : Prop
-    := Minimal (fun y : Range => y ∈ ConstraintSet.image objective) value
+    := IsLeast (ConstraintSet.image objective) value
 
 /-- max of f(x) for all x in C -/
 def MaximumOn
@@ -46,7 +46,7 @@ def MaximumOn
     (ConstraintSet: Set Domain)
     (value : Range)
     : Prop
-    := Maximal (fun y : Range => y ∈ ConstraintSet.image objective) value
+    := IsGreatest (ConstraintSet.image objective) value
 
 /-- y s.t. f(y) = min of f(x) for all x in C -/
 def ArgumentMinimumOn
@@ -78,7 +78,7 @@ def InfimumOn
     (ConstraintSet: Set Domain)
     (value : Range)
     : Prop
-    := Maximal (fun y: Range => ∀ x ∈ ConstraintSet, y ≤ objective x) value
+    := IsGLB (ConstraintSet.image objective) value
 
 /-- sup of f(x) for all x in C -/
 def SupremumOn
@@ -88,7 +88,7 @@ def SupremumOn
     (ConstraintSet: Set Domain)
     (value : Range)
     : Prop
-    := Minimal (fun y: Range => ∀ x ∈ ConstraintSet, objective x ≤ y) value
+    := IsLUB (ConstraintSet.image objective) value
 
 /--
 If a function is L-continuous, any two points that are a distance `d` apart
