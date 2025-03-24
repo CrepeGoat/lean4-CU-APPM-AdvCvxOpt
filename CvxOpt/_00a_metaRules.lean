@@ -274,9 +274,9 @@ theorem min_comm'
     {C2 : Set D2}
     {f : D → D2 → R}
     {fxmin : D2 → R}
-    {hfxmin : ∀ y ∈ C2, MinimumOn (fun x => f x y) C (fxmin y)}
+    {hfxmin : MinimumOn f C fxmin}
     {fymin : D → R}
-    {hfymin : ∀ x ∈ C, MinimumOn (fun y => f x y) C2 (fymin x)}
+    {hfymin : MinimumOn (fun y => fun x => f x y) C2 fymin}
     {fmin : R}
     : MinimumOn fxmin C2 fmin ↔ MinimumOn fymin C fmin
     := by
@@ -288,13 +288,13 @@ theorem saddle_point_inequality
     {C2 : Set D2}
     {f : D → D2 → R}
     {fxmax : D2 → R}
-    {hfxmax : ∀ y ∈ C2, MaximumOn (fun x => f x y) C (fxmax y)}
+    {hfxmax : MaximumOn f C fxmax}
     {fymin : D → R}
-    {hfymin : ∀ x ∈ C, MinimumOn (fun y => f x y) C2 (fymin x)}
-    {fminmax : R}
-    {hfminmax : MinimumOn fxmax C2 fminmax}
-    {fmaxmin : R}
-    {hfmaxmin : MaximumOn fxmin C fmaxmin}
+    {hfymin : MinimumOn (fun y => fun x => f x y) C2 fymin}
+    (fminmax : R)
+    (hfminmax : MinimumOn fxmax C2 fminmax)
+    (fmaxmin : R)
+    (hfmaxmin : MaximumOn fxmin C fmaxmin)
     : fmaxmin ≤ fminmax
     := by
     sorry
