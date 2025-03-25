@@ -288,63 +288,153 @@ theorem sum_min_le_min_sum
 
 /- Rule 4 -/
 
-theorem min_comm'
-    [Preorder R]
+theorem minx_miny_iff_minxy
+    [LinearOrder R]
     {D2 : Type*}
     {C2 : Set D2}
     {f : D → D2 → R}
     {fmin : R}
     {fxmin : D2 → R}
     {hfxmin : ∀ y ∈ C2, MinimumOn (fun x => f x y) C (fxmin y)}
-    : MinimumOn fxmin C2 fmin → MinimumOn (fun xy : D × D2 => f xy.1 xy.2) (C ×ˢ C2) fmin
+    : MinimumOn fxmin C2 fmin ↔ MinimumOn (fun xy : D × D2 => f xy.1 xy.2) (C ×ˢ C2) fmin
     := by
     simp [MinimumOn, IsLeast, lowerBounds] at hfxmin
-    simp [MinimumOn, IsLeast, lowerBounds]
-    intro yopt hYoptInC2 hFxminYoptEqFmin hFminLeFxmin
-    have xopt := (hfxmin yopt hYoptInC2).left.choose
     constructor
-    case left =>
-        exists (hfxmin yopt hYoptInC2).left.choose, yopt
+    case mp =>
+        simp [MinimumOn, IsLeast, lowerBounds]
+        intro yopt hYoptInC2 hFxminYoptEqFmin hFminLeFxmin
+        have xopt := (hfxmin yopt hYoptInC2).left.choose
         constructor
-        case left => exact ⟨(hfxmin yopt hYoptInC2).left.choose_spec.left, hYoptInC2⟩
+        case left =>
+            exists (hfxmin yopt hYoptInC2).left.choose, yopt
+            constructor
+            case left => exact ⟨(hfxmin yopt hYoptInC2).left.choose_spec.left, hYoptInC2⟩
+            case right =>
+                rw [(hfxmin yopt hYoptInC2).left.choose_spec.right]
+                apply hFxminYoptEqFmin
         case right =>
-            rw [(hfxmin yopt hYoptInC2).left.choose_spec.right]
-            apply hFxminYoptEqFmin
-    case right =>
-        intro z x y hXInC hYInC2 fxyEqZ
-        rw [← fxyEqZ]
-        apply le_trans
-        apply hFminLeFxmin y hYInC2
-        exact (hfxmin y hYInC2).right x hXInC
+            intro z x y hXInC hYInC2 fxyEqZ
+            rw [← fxyEqZ]
+            apply le_trans
+            apply hFminLeFxmin y hYInC2
+            exact (hfxmin y hYInC2).right x hXInC
+    case mpr =>
+        simp [MinimumOn, IsLeast, lowerBounds]
+        intro xopt yopt hXoptInC hYoptInC2 hFXYoptEqFmin hFminLeF
+        constructor
+        case left =>
+            exists yopt
+            constructor
+            case left => exact hYoptInC2
+            case right =>
 
+            rw [← hFXYoptEqFmin]
+            rw [← hFXYoptEqFmin] at hFminLeF
+            rw [eq_iff_le_not_lt]
+            constructor
+            case left => exact (hfxmin yopt hYoptInC2).right xopt hXoptInC
+            case right =>
+
+            rw [not_lt]
+            apply hFminLeF
+            exact (hfxmin yopt hYoptInC2).left.choose_spec.left
+            exact hYoptInC2
+            exact (hfxmin yopt hYoptInC2).left.choose_spec.right
+        case right =>
+            intro y hYInC2
+            rw [← (hfxmin y hYInC2).left.choose_spec.right]
+            apply hFminLeF
+            exact (hfxmin y hYInC2).left.choose_spec.left
+            exact hYInC2
+            rfl
+
+theorem miny_minx_iff_minxy
+    [LinearOrder R]
+    {D2 : Type*}
+    {C2 : Set D2}
+    {f : D → D2 → R}
+    {fmin : R}
+    {fymin : D → R}
+    {hfymin : ∀ x ∈ C, MinimumOn (fun y => f x y) C2 (fymin x)}
+    : MinimumOn fymin C fmin ↔ MinimumOn (fun xy : D × D2 => f xy.1 xy.2) (C ×ˢ C2) fmin
+    := by
+    simp [MinimumOn, IsLeast, lowerBounds] at hfymin
+    constructor
+    case mp =>
+        simp [MinimumOn, IsLeast, lowerBounds]
+        intro xopt hXoptInC hFyminXoptEqFmin hFminLeFymin
+        have yopt := (hfymin xopt hXoptInC).left.choose
+        constructor
+        case left =>
+            exists xopt, (hfymin xopt hXoptInC).left.choose
+            constructor
+            case left => exact ⟨hXoptInC, (hfymin xopt hXoptInC).left.choose_spec.left⟩
+            case right =>
+                rw [(hfymin xopt hXoptInC).left.choose_spec.right]
+                apply hFyminXoptEqFmin
+        case right =>
+            intro z x y hXInC hYInC2 fxyEqZ
+            rw [← fxyEqZ]
+            apply le_trans
+            apply hFminLeFymin x hXInC
+            exact (hfymin x hXInC).right y hYInC2
+    case mpr =>
+        simp [MinimumOn, IsLeast, lowerBounds]
+        intro xopt yopt hXoptInC hYoptInC2 hFXYoptEqFmin hFminLeF
+        constructor
+        case left =>
+            exists xopt
+            constructor
+            case left => exact hXoptInC
+            case right =>
+
+            rw [← hFXYoptEqFmin]
+            rw [← hFXYoptEqFmin] at hFminLeF
+            rw [eq_iff_le_not_lt]
+            constructor
+            case left => exact (hfymin xopt hXoptInC).right yopt hYoptInC2
+            case right =>
+
+            rw [not_lt]
+            apply hFminLeF
+            exact hXoptInC
+            exact (hfymin xopt hXoptInC).left.choose_spec.left
+            exact (hfymin xopt hXoptInC).left.choose_spec.right
+        case right =>
+            intro x hXInC
+            rw [← (hfymin x hXInC).left.choose_spec.right]
+            apply hFminLeF
+            exact hXInC
+            exact (hfymin x hXInC).left.choose_spec.left
+            rfl
 
 theorem min_comm'
-    [LE R]
+    [LinearOrder R]
     {D2 : Type*}
     {C2 : Set D2}
     {f : D → D2 → R}
     {fxmin : D2 → R}
-    {hfxmin : MinimumOn f C fxmin}
+    {hfxmin : ∀ y ∈ C2, MinimumOn (fun x => f x y) C (fxmin y)}
     {fymin : D → R}
-    {hfymin : MinimumOn (fun y => fun x => f x y) C2 fymin}
+    {hfymin : ∀ x ∈ C, MinimumOn (fun y => f x y) C2 (fymin x)}
     {fmin : R}
     : MinimumOn fxmin C2 fmin ↔ MinimumOn fymin C fmin
     := by
-    simp [MinimumOn, IsLeast, lowerBounds] at hfxmin
-    simp [MinimumOn, IsLeast, lowerBounds] at hfymin
-
     constructor
-    simp [MinimumOn, IsLeast, lowerBounds]
     case mp =>
-        intro x1 hX1InC hFxmin1EqFmin hFminLeFxmin
-        constructor
-        case left =>
-            sorry
-        case right =>
-            sorry
+        rw [minx_miny_iff_minxy, ← miny_minx_iff_minxy]
+        intro h
+        exact h
+        exact f
+        exact hfymin
+        exact hfxmin
     case mpr =>
-        sorry
-
+        rw [miny_minx_iff_minxy, ← minx_miny_iff_minxy]
+        intro h
+        exact h
+        exact f
+        exact hfxmin
+        exact hfymin
 
 theorem saddle_point_inequality
     [LE R]
