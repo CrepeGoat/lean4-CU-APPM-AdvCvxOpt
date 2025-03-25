@@ -289,6 +289,36 @@ theorem sum_min_le_min_sum
 /- Rule 4 -/
 
 theorem min_comm'
+    [Preorder R]
+    {D2 : Type*}
+    {C2 : Set D2}
+    {f : D → D2 → R}
+    {fmin : R}
+    {fxmin : D2 → R}
+    {hfxmin : ∀ y ∈ C2, MinimumOn (fun x => f x y) C (fxmin y)}
+    : MinimumOn fxmin C2 fmin → MinimumOn (fun xy : D × D2 => f xy.1 xy.2) (C ×ˢ C2) fmin
+    := by
+    simp [MinimumOn, IsLeast, lowerBounds] at hfxmin
+    simp [MinimumOn, IsLeast, lowerBounds]
+    intro yopt hYoptInC2 hFxminYoptEqFmin hFminLeFxmin
+    have xopt := (hfxmin yopt hYoptInC2).left.choose
+    constructor
+    case left =>
+        exists (hfxmin yopt hYoptInC2).left.choose, yopt
+        constructor
+        case left => exact ⟨(hfxmin yopt hYoptInC2).left.choose_spec.left, hYoptInC2⟩
+        case right =>
+            rw [(hfxmin yopt hYoptInC2).left.choose_spec.right]
+            apply hFxminYoptEqFmin
+    case right =>
+        intro z x y hXInC hYInC2 fxyEqZ
+        rw [← fxyEqZ]
+        apply le_trans
+        apply hFminLeFxmin y hYInC2
+        exact (hfxmin y hYInC2).right x hXInC
+
+
+theorem min_comm'
     [LE R]
     {D2 : Type*}
     {C2 : Set D2}
@@ -300,7 +330,21 @@ theorem min_comm'
     {fmin : R}
     : MinimumOn fxmin C2 fmin ↔ MinimumOn fymin C fmin
     := by
-    sorry
+    simp [MinimumOn, IsLeast, lowerBounds] at hfxmin
+    simp [MinimumOn, IsLeast, lowerBounds] at hfymin
+
+    constructor
+    simp [MinimumOn, IsLeast, lowerBounds]
+    case mp =>
+        intro x1 hX1InC hFxmin1EqFmin hFminLeFxmin
+        constructor
+        case left =>
+            sorry
+        case right =>
+            sorry
+    case mpr =>
+        sorry
+
 
 theorem saddle_point_inequality
     [LE R]
