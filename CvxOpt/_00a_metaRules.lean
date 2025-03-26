@@ -18,9 +18,9 @@ $$
 theorem min_obj_to_neg_max_neg_obj
     [OrderedAddCommGroup R]
     {min : R}
-    : MinimumOn f S min → MaximumOn (fun x: D => -(f x)) S (-min)
+    (hmin : MinimumOn f S min)
+    : MaximumOn (fun x: D => -(f x)) S (-min)
     := by
-        intro hmin
         constructor
         case left => simp; exact hmin.left
         simp [upperBounds]
@@ -37,10 +37,10 @@ $$
 -/
 theorem max_obj_to_neg_min_neg_obj
     [OrderedAddCommGroup R]
-    {min : R}
-    : MaximumOn f S min → MinimumOn (fun x: D => -(f x)) S (-min)
+    {max : R}
+    (hmax : MaximumOn f S max)
+    : MinimumOn (fun x: D => -(f x)) S (-max)
     := by
-        intro hmax
         constructor
         case left => simp; exact hmax.left
         simp [lowerBounds]
@@ -58,9 +58,9 @@ $$
 theorem inf_obj_to_neg_sup_neg_obj
     [OrderedAddCommGroup R]
     {inf: R}
-    : InfimumOn f S inf → SupremumOn (fun x: D => -(f x)) S (-inf)
+    (hinf : InfimumOn f S inf)
+    : SupremumOn (fun x: D => -(f x)) S (-inf)
     := by
-        intro hinf
         constructor
         case left =>
             simp [upperBounds]
@@ -87,9 +87,9 @@ $$
 theorem sup_obj_to_neg_inf_neg_obj
     [OrderedAddCommGroup R]
     {sup: R}
-    : SupremumOn f S sup → InfimumOn (fun x: D => -(f x)) S (-sup)
+    (hsup : SupremumOn f S sup)
+    : InfimumOn (fun x: D => -(f x)) S (-sup)
     := by
-        intro hsup
         constructor
         case left =>
             simp [lowerBounds]
