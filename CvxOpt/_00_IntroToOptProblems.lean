@@ -31,8 +31,6 @@ section intro_to_opt_problems
 variable
     {D: Type*}
     {R: Type*} [LE R]
-    (f: D → R)
-    (S: Set D)
 
 /-- min of f(x) for all x in C -/
 def MinimumOn
@@ -144,6 +142,8 @@ theorem holder_inequality
 
 def epsilon_optimal
     [HSub R R R]
+    (f: D → R)
+    (S: Set D)
     (min : R)
     (hmin : MinimumOn f S min)
     (value : D)
