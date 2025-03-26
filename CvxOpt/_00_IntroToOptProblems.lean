@@ -28,67 +28,57 @@ uses CvxLean as a reference:
 
 section intro_to_opt_problems
 
+variable
+    {D: Type*}
+    {R: Type*} [LE R]
+    (f: D → R)
+    (S: Set D)
+
 /-- min of f(x) for all x in C -/
 def MinimumOn
-    {Domain: Type*}
-    {Range: Type*} [LE Range]
-    (objective: Domain → Range)
-    (ConstraintSet: Set Domain)
-    (value : Range)
+    (f: D → R)
+    (S: Set D)
+    (value : R)
     : Prop
-    := IsLeast (ConstraintSet.image objective) value
+    := IsLeast (S.image f) value
 
 /-- max of f(x) for all x in C -/
 def MaximumOn
-    {Domain: Type*}
-    {Range: Type*} [LE Range]
-    (objective: Domain → Range)
-    (ConstraintSet: Set Domain)
-    (value : Range)
+    (f: D → R)
+    (S: Set D)
+    (value : R)
     : Prop
-    := IsGreatest (ConstraintSet.image objective) value
+    := IsGreatest (S.image f) value
 
 /-- y s.t. f(y) = min of f(x) for all x in C -/
 def ArgumentMinimumOn
-    {Domain: Type*}
-    {Range: Type*} [LE Range]
-    (objective: Domain → Range)
-    (ConstraintSet: Set Domain)
-    : Set Domain
-    := setOf fun xmin: Domain =>
-        xmin ∈ ConstraintSet
-        ∧ MinimumOn objective ConstraintSet (objective xmin)
+    (f: D → R)
+    (S: Set D)
+    : Set D
+    := setOf fun xmin: D => xmin ∈ S ∧ MinimumOn f S (f xmin)
 
 /-- y s.t. f(y) = max of f(x) for all x in C -/
 def ArgumentMaximumOn
-    {Domain: Type*}
-    {Range: Type*} [LE Range]
-    (objective: Domain → Range)
-    (ConstraintSet: Set Domain)
-    : Set Domain
-    := setOf fun xmax: Domain =>
-        xmax ∈ ConstraintSet
-        ∧ MaximumOn objective ConstraintSet (objective xmax)
+    (f: D → R)
+    (S: Set D)
+    : Set D
+    := setOf fun xmax: D => xmax ∈ S ∧ MaximumOn f S (f xmax)
 
 /-- inf of f(x) for all x in C -/
 def InfimumOn
-    {Domain: Type*}
-    {Range: Type*} [LE Range]
-    (objective: Domain → Range)
-    (ConstraintSet: Set Domain)
-    (value : Range)
+    (f: D → R)
+    (S: Set D)
+    (value : R)
     : Prop
-    := IsGLB (ConstraintSet.image objective) value
+    := IsGLB (S.image f) value
 
 /-- sup of f(x) for all x in C -/
 def SupremumOn
-    {Domain: Type*}
-    {Range: Type*} [LE Range]
-    (objective: Domain → Range)
-    (ConstraintSet: Set Domain)
-    (value : Range)
+    (f: D → R)
+    (S: Set D)
+    (value : R)
     : Prop
-    := IsLUB (ConstraintSet.image objective) value
+    := IsLUB (S.image f) value
 
 /--
 If a function is L-continuous, any two points that are a distance `d` apart
@@ -120,15 +110,12 @@ theorem holder_inequality
 
 
 def epsilon_optimal
-    {D: Type*}
-    {R: Type*} [LE R] [HSub R R R]
-    (obj: D → R)
-    (C: Set D)
+    [HSub R R R]
     (min : R)
-    (hmin : MinimumOn obj C min)
+    (hmin : MinimumOn f S min)
     (value : D)
     (epsilon : R)
     : Prop
-    := obj value - min ≤ epsilon
+    := f value - min ≤ epsilon
 
 end intro_to_opt_problems
