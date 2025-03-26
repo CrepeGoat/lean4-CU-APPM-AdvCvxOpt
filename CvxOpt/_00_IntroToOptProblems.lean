@@ -80,6 +80,39 @@ def SupremumOn
     : Prop
     := IsLUB (S.image f) value
 
+theorem inf_of_min
+    {f: D → R}
+    {S: Set D}
+    {min : R}
+    (hmin : MinimumOn f S min)
+    : InfimumOn f S min
+    := by
+    simp [InfimumOn, IsGLB, IsGreatest, upperBounds, lowerBounds]
+    simp [MinimumOn, IsLeast, lowerBounds] at hmin
+
+    constructor
+    exact hmin.right
+    intro y h
+    rw [← hmin.left.choose_spec.right]
+    apply h
+    exact hmin.left.choose_spec.left
+
+theorem min_of_inf_and_exists
+    {f: D → R}
+    {S: Set D}
+    {inf : R}
+    (hinf : InfimumOn f S inf)
+    (h : ∃ x ∈ S, f x = inf)
+    : MinimumOn f S inf
+    := by
+    simp [MinimumOn, IsLeast, upperBounds, lowerBounds]
+    simp [InfimumOn, IsGLB, IsGreatest, IsLeast, lowerBounds, upperBounds] at hinf
+
+    constructor
+    exact h
+    intro x hXInS
+    exact hinf.left x hXInS
+
 /--
 If a function is L-continuous, any two points that are a distance `d` apart
 are no more than `L * d` apart when mapped through the function.
