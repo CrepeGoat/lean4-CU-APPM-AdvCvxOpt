@@ -35,55 +35,55 @@ variable
 /-- min of f(x) for all x in C -/
 def MinimumOn
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     (value : R)
     : Prop
-    := IsLeast (S.image f) value
+    := IsLeast (C.image f) value
 
 /-- max of f(x) for all x in C -/
 def MaximumOn
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     (value : R)
     : Prop
-    := IsGreatest (S.image f) value
+    := IsGreatest (C.image f) value
 
 /-- y s.t. f(y) = min of f(x) for all x in C -/
 def ArgumentMinimumOn
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     : Set D
-    := setOf fun xmin: D => xmin ∈ S ∧ MinimumOn f S (f xmin)
+    := setOf fun xmin: D => xmin ∈ C ∧ MinimumOn f C (f xmin)
 
 /-- y s.t. f(y) = max of f(x) for all x in C -/
 def ArgumentMaximumOn
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     : Set D
-    := setOf fun xmax: D => xmax ∈ S ∧ MaximumOn f S (f xmax)
+    := setOf fun xmax: D => xmax ∈ C ∧ MaximumOn f C (f xmax)
 
 /-- inf of f(x) for all x in C -/
 def InfimumOn
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     (value : R)
     : Prop
-    := IsGLB (S.image f) value
+    := IsGLB (C.image f) value
 
 /-- sup of f(x) for all x in C -/
 def SupremumOn
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     (value : R)
     : Prop
-    := IsLUB (S.image f) value
+    := IsLUB (C.image f) value
 
 theorem inf_of_min
     {f: D → R}
-    {S: Set D}
+    {C: Set D}
     {min : R}
-    (hmin : MinimumOn f S min)
-    : InfimumOn f S min
+    (hmin : MinimumOn f C min)
+    : InfimumOn f C min
     := by
     simp [InfimumOn, IsGLB, IsGreatest, upperBounds, lowerBounds]
     simp [MinimumOn, IsLeast, lowerBounds] at hmin
@@ -97,11 +97,11 @@ theorem inf_of_min
 
 theorem min_of_inf_and_exists
     {f: D → R}
-    {S: Set D}
+    {C: Set D}
     {inf : R}
-    (hinf : InfimumOn f S inf)
-    (h : ∃ x ∈ S, f x = inf)
-    : MinimumOn f S inf
+    (hinf : InfimumOn f C inf)
+    (h : ∃ x ∈ C, f x = inf)
+    : MinimumOn f C inf
     := by
     simp [MinimumOn, IsLeast, upperBounds, lowerBounds]
     simp [InfimumOn, IsGLB, IsGreatest, IsLeast, lowerBounds, upperBounds] at hinf
@@ -143,9 +143,9 @@ theorem holder_inequality
 def epsilon_optimal
     [HSub R R R]
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     (min : R)
-    (hmin : MinimumOn f S min)
+    (hmin : MinimumOn f C min)
     (value : D)
     (epsilon : R)
     : Prop

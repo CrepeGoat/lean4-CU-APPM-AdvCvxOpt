@@ -4,7 +4,7 @@ import CvxOpt._00_IntroToOptProblems
 
 section meta_rules
 
-variable {D : Type*} {R : Type*} {f: D → R} {S: Set D}
+variable {D : Type*} {R : Type*} {f: D → R} {C: Set D}
 
 /- Rule 1: min/max transforms -/
 
@@ -18,8 +18,8 @@ $$
 theorem min_obj_to_neg_max_neg_obj
     [OrderedAddCommGroup R]
     {min : R}
-    (hmin : MinimumOn f S min)
-    : MaximumOn (fun x: D => -(f x)) S (-min)
+    (hmin : MinimumOn f C min)
+    : MaximumOn (fun x: D => -(f x)) C (-min)
     := by
         constructor
         case left => simp; exact hmin.left
@@ -38,8 +38,8 @@ $$
 theorem max_obj_to_neg_min_neg_obj
     [OrderedAddCommGroup R]
     {max : R}
-    (hmax : MaximumOn f S max)
-    : MinimumOn (fun x: D => -(f x)) S (-max)
+    (hmax : MaximumOn f C max)
+    : MinimumOn (fun x: D => -(f x)) C (-max)
     := by
         constructor
         case left => simp; exact hmax.left
@@ -58,8 +58,8 @@ $$
 theorem inf_obj_to_neg_sup_neg_obj
     [OrderedAddCommGroup R]
     {inf: R}
-    (hinf : InfimumOn f S inf)
-    : SupremumOn (fun x: D => -(f x)) S (-inf)
+    (hinf : InfimumOn f C inf)
+    : SupremumOn (fun x: D => -(f x)) C (-inf)
     := by
         constructor
         case left =>
@@ -74,9 +74,9 @@ theorem inf_obj_to_neg_sup_neg_obj
             simp [upperBounds, lowerBounds] at hinfr
             rw [neg_le]
             apply hinfr
-            intro x hXInS
+            intro x hXInC
             rw [neg_le]
-            exact hNegObjLeY x hXInS
+            exact hNegObjLeY x hXInC
 /--
 Convert a sup expression to an inf via the equation:
 
@@ -87,8 +87,8 @@ $$
 theorem sup_obj_to_neg_inf_neg_obj
     [OrderedAddCommGroup R]
     {sup: R}
-    (hsup : SupremumOn f S sup)
-    : InfimumOn (fun x: D => -(f x)) S (-sup)
+    (hsup : SupremumOn f C sup)
+    : InfimumOn (fun x: D => -(f x)) C (-sup)
     := by
         constructor
         case left =>
@@ -103,9 +103,9 @@ theorem sup_obj_to_neg_inf_neg_obj
             simp [upperBounds, lowerBounds] at hsupr
             rw [le_neg]
             apply hsupr
-            intro x hXInS
+            intro x hXInC
             rw [le_neg]
-            exact hYLeNegObj x hXInS
+            exact hYLeNegObj x hXInC
 
 /--
 Convert an argmin expression to an argmax via the equation:
@@ -116,7 +116,7 @@ $$
 -/
 theorem argmin_obj_to_argmax_neg_obj
     [OrderedAddCommGroup R]
-    : ArgumentMinimumOn f S = ArgumentMaximumOn (fun x: D => -(f x)) S
+    : ArgumentMinimumOn f C = ArgumentMaximumOn (fun x: D => -(f x)) C
     := by
         unfold ArgumentMinimumOn ArgumentMaximumOn
         unfold MinimumOn MaximumOn
@@ -133,7 +133,7 @@ $$
 -/
 theorem argmax_obj_to_argmin_neg_obj
     [OrderedAddCommGroup R]
-    : ArgumentMaximumOn f S = ArgumentMinimumOn (fun x: D => -(f x)) S
+    : ArgumentMaximumOn f C = ArgumentMinimumOn (fun x: D => -(f x)) C
     := by
         unfold ArgumentMinimumOn ArgumentMaximumOn
         unfold MinimumOn MaximumOn
@@ -151,8 +151,8 @@ $$
 theorem argmin_obj_subset_argmin_non_decreasing_comp_obj
     [LinearOrder R]
     (φ : R → R)
-    (hφ : MonotoneOn φ (S.image f))
-    : ArgumentMinimumOn f S ⊆ ArgumentMinimumOn (φ ∘ f) S
+    (hφ : MonotoneOn φ (C.image f))
+    : ArgumentMinimumOn f C ⊆ ArgumentMinimumOn (φ ∘ f) C
     := by
         unfold ArgumentMinimumOn
         unfold MinimumOn
@@ -164,41 +164,41 @@ theorem argmin_obj_subset_argmin_non_decreasing_comp_obj
         case left =>
             intro x1
             simp
-            intro hX1InS x2 hX2InS hFEq _ _
+            intro hX1InC x2 hX2InC hFEq _ _
             constructor
-            case left => exact hX1InS
+            case left => exact hX1InC
             exists x2
             constructor
-            case right.left => exact hX2InS
+            case right.left => exact hX2InC
             rewrite [hFEq]
             rfl
         case right =>
 
         intro x1
         simp
-        intro hX1InS x2 hX2InS hFEq hX1InS hLeF1ThenF1Le
+        intro hX1InC x2 hX2InC hFEq hX1InC hLeF1ThenF1Le
         constructor
-        case left => exact hX1InS
+        case left => exact hX1InC
         case right =>
-        intro x3 hX3InS
+        intro x3 hX3InC
         apply hφ
         exists x1
         exists x3
         apply hLeF1ThenF1Le
-        exact hX3InS
+        exact hX3InC
 
 /-
-Minimizing over an inSreasing function φ does not affect the optimal points:
+Minimizing over an inCreasing function φ does not affect the optimal points:
 
 $$
 \text{argmin}_x f(x) = \text{argmin}_x φ(f(x))
 $$
 -/
-theorem argmin_obj_eq_argmin_inSreasing_comp_obj
+theorem argmin_obj_eq_argmin_inCreasing_comp_obj
     [LinearOrder R]
     (φ : R → R)
-    (hφ : StrictMonoOn φ (S.image f))
-    : ArgumentMinimumOn f S = ArgumentMinimumOn (φ ∘ f) S
+    (hφ : StrictMonoOn φ (C.image f))
+    : ArgumentMinimumOn f C = ArgumentMinimumOn (φ ∘ f) C
     := by
         rw [Set.Subset.antisymm_iff]
         constructor
@@ -215,35 +215,35 @@ theorem argmin_obj_eq_argmin_inSreasing_comp_obj
         case left =>
             intro x1
             simp
-            intro hX1InS _ _ _ _ _
+            intro hX1InC _ _ _ _ _
             constructor
-            case left => exact hX1InS
+            case left => exact hX1InC
             exists x1
         case right =>
 
         intro x1
         simp
-        intro hX1InS x2 hX2InS hφ2Eqφ1 hX1InS hLeφ1Thenφ1Le
+        intro hX1InC x2 hX2InC hφ2Eqφ1 hX1InC hLeφ1Thenφ1Le
         constructor
-        case left => exact hX1InS
+        case left => exact hX1InC
         case right =>
 
-        intro x3 hX3InS
+        intro x3 hX3InC
         rw [← hφ.le_iff_le]
         case ha => exists x1
         case hb => exists x3
-        exact hLeφ1Thenφ1Le x3 hX3InS
+        exact hLeφ1Thenφ1Le x3 hX3InC
 
 /- Rule 2 -/
 
 theorem subset_then_min_le_min
     [LinearOrder R]
     {fmin : R}
-    {S2 : Set D}
+    {C2 : Set D}
     {fmin2 : R}
-    (min : MinimumOn f S fmin)
-    (min2 : MinimumOn f S2 fmin2)
-    : S ⊆ S2 → fmin2 ≤ fmin
+    (min : MinimumOn f C fmin)
+    (min2 : MinimumOn f C2 fmin2)
+    : C ⊆ C2 → fmin2 ≤ fmin
     := by
     simp [MinimumOn, IsLeast, lowerBounds] at min
     simp [MinimumOn, IsLeast, lowerBounds] at min2
@@ -266,9 +266,9 @@ theorem sum_min_le_min_sum
     {fmin : R}
     {gmin : R}
     {fgmin : R}
-    (minF : MinimumOn f S fmin)
-    (minG : MinimumOn g S gmin)
-    (minFG : MinimumOn (fun x => f x + g x) S fgmin)
+    (minF : MinimumOn f C fmin)
+    (minG : MinimumOn g C gmin)
+    (minFG : MinimumOn (fun x => f x + g x) C fgmin)
     : fmin + gmin ≤ fgmin
     := by
     simp [MinimumOn, IsLeast, lowerBounds] at minF
@@ -291,134 +291,134 @@ theorem sum_min_le_min_sum
 theorem minx_miny_iff_minxy
     [LinearOrder R]
     {D2 : Type*}
-    {S2 : Set D2}
+    {C2 : Set D2}
     {f : D → D2 → R}
     {fmin : R}
     {fxmin : D2 → R}
-    {hfxmin : ∀ y ∈ S2, MinimumOn (fun x => f x y) S (fxmin y)}
-    : MinimumOn fxmin S2 fmin ↔ MinimumOn (fun xy : D × D2 => f xy.1 xy.2) (S ×ˢ S2) fmin
+    {hfxmin : ∀ y ∈ C2, MinimumOn (fun x => f x y) C (fxmin y)}
+    : MinimumOn fxmin C2 fmin ↔ MinimumOn (fun xy : D × D2 => f xy.1 xy.2) (C ×ˢ C2) fmin
     := by
     simp [MinimumOn, IsLeast, lowerBounds] at hfxmin
     constructor
     case mp =>
         simp [MinimumOn, IsLeast, lowerBounds]
-        intro yopt hYoptInS2 hFxminYoptEqFmin hFminLeFxmin
-        have xopt := (hfxmin yopt hYoptInS2).left.choose
+        intro yopt hYoptInC2 hFxminYoptEqFmin hFminLeFxmin
+        have xopt := (hfxmin yopt hYoptInC2).left.choose
         constructor
         case left =>
-            exists (hfxmin yopt hYoptInS2).left.choose, yopt
+            exists (hfxmin yopt hYoptInC2).left.choose, yopt
             constructor
-            case left => exact ⟨(hfxmin yopt hYoptInS2).left.choose_spec.left, hYoptInS2⟩
+            case left => exact ⟨(hfxmin yopt hYoptInC2).left.choose_spec.left, hYoptInC2⟩
             case right =>
-                rw [(hfxmin yopt hYoptInS2).left.choose_spec.right]
+                rw [(hfxmin yopt hYoptInC2).left.choose_spec.right]
                 apply hFxminYoptEqFmin
         case right =>
-            intro z x y hXInS hYInS2 fxyEqZ
+            intro z x y hXInC hYInC2 fxyEqZ
             rw [← fxyEqZ]
             apply le_trans
-            apply hFminLeFxmin y hYInS2
-            exact (hfxmin y hYInS2).right x hXInS
+            apply hFminLeFxmin y hYInC2
+            exact (hfxmin y hYInC2).right x hXInC
     case mpr =>
         simp [MinimumOn, IsLeast, lowerBounds]
-        intro xopt yopt hXoptInS hYoptInS2 hFXYoptEqFmin hFminLeF
+        intro xopt yopt hXoptInC hYoptInC2 hFXYoptEqFmin hFminLeF
         constructor
         case left =>
             exists yopt
             constructor
-            case left => exact hYoptInS2
+            case left => exact hYoptInC2
             case right =>
 
             rw [← hFXYoptEqFmin]
             rw [← hFXYoptEqFmin] at hFminLeF
             rw [eq_iff_le_not_lt]
             constructor
-            case left => exact (hfxmin yopt hYoptInS2).right xopt hXoptInS
+            case left => exact (hfxmin yopt hYoptInC2).right xopt hXoptInC
             case right =>
 
             rw [not_lt]
             apply hFminLeF
-            exact (hfxmin yopt hYoptInS2).left.choose_spec.left
-            exact hYoptInS2
-            exact (hfxmin yopt hYoptInS2).left.choose_spec.right
+            exact (hfxmin yopt hYoptInC2).left.choose_spec.left
+            exact hYoptInC2
+            exact (hfxmin yopt hYoptInC2).left.choose_spec.right
         case right =>
-            intro y hYInS2
-            rw [← (hfxmin y hYInS2).left.choose_spec.right]
+            intro y hYInC2
+            rw [← (hfxmin y hYInC2).left.choose_spec.right]
             apply hFminLeF
-            exact (hfxmin y hYInS2).left.choose_spec.left
-            exact hYInS2
+            exact (hfxmin y hYInC2).left.choose_spec.left
+            exact hYInC2
             rfl
 
 theorem miny_minx_iff_minxy
     [LinearOrder R]
     {D2 : Type*}
-    {S2 : Set D2}
+    {C2 : Set D2}
     {f : D → D2 → R}
     {fmin : R}
     {fymin : D → R}
-    {hfymin : ∀ x ∈ S, MinimumOn (fun y => f x y) S2 (fymin x)}
-    : MinimumOn fymin S fmin ↔ MinimumOn (fun xy : D × D2 => f xy.1 xy.2) (S ×ˢ S2) fmin
+    {hfymin : ∀ x ∈ C, MinimumOn (fun y => f x y) C2 (fymin x)}
+    : MinimumOn fymin C fmin ↔ MinimumOn (fun xy : D × D2 => f xy.1 xy.2) (C ×ˢ C2) fmin
     := by
     simp [MinimumOn, IsLeast, lowerBounds] at hfymin
     constructor
     case mp =>
         simp [MinimumOn, IsLeast, lowerBounds]
-        intro xopt hXoptInS hFyminXoptEqFmin hFminLeFymin
-        have yopt := (hfymin xopt hXoptInS).left.choose
+        intro xopt hXoptInC hFyminXoptEqFmin hFminLeFymin
+        have yopt := (hfymin xopt hXoptInC).left.choose
         constructor
         case left =>
-            exists xopt, (hfymin xopt hXoptInS).left.choose
+            exists xopt, (hfymin xopt hXoptInC).left.choose
             constructor
-            case left => exact ⟨hXoptInS, (hfymin xopt hXoptInS).left.choose_spec.left⟩
+            case left => exact ⟨hXoptInC, (hfymin xopt hXoptInC).left.choose_spec.left⟩
             case right =>
-                rw [(hfymin xopt hXoptInS).left.choose_spec.right]
+                rw [(hfymin xopt hXoptInC).left.choose_spec.right]
                 apply hFyminXoptEqFmin
         case right =>
-            intro z x y hXInS hYInS2 fxyEqZ
+            intro z x y hXInC hYInC2 fxyEqZ
             rw [← fxyEqZ]
             apply le_trans
-            apply hFminLeFymin x hXInS
-            exact (hfymin x hXInS).right y hYInS2
+            apply hFminLeFymin x hXInC
+            exact (hfymin x hXInC).right y hYInC2
     case mpr =>
         simp [MinimumOn, IsLeast, lowerBounds]
-        intro xopt yopt hXoptInS hYoptInS2 hFXYoptEqFmin hFminLeF
+        intro xopt yopt hXoptInC hYoptInC2 hFXYoptEqFmin hFminLeF
         constructor
         case left =>
             exists xopt
             constructor
-            case left => exact hXoptInS
+            case left => exact hXoptInC
             case right =>
 
             rw [← hFXYoptEqFmin]
             rw [← hFXYoptEqFmin] at hFminLeF
             rw [eq_iff_le_not_lt]
             constructor
-            case left => exact (hfymin xopt hXoptInS).right yopt hYoptInS2
+            case left => exact (hfymin xopt hXoptInC).right yopt hYoptInC2
             case right =>
 
             rw [not_lt]
             apply hFminLeF
-            exact hXoptInS
-            exact (hfymin xopt hXoptInS).left.choose_spec.left
-            exact (hfymin xopt hXoptInS).left.choose_spec.right
+            exact hXoptInC
+            exact (hfymin xopt hXoptInC).left.choose_spec.left
+            exact (hfymin xopt hXoptInC).left.choose_spec.right
         case right =>
-            intro x hXInS
-            rw [← (hfymin x hXInS).left.choose_spec.right]
+            intro x hXInC
+            rw [← (hfymin x hXInC).left.choose_spec.right]
             apply hFminLeF
-            exact hXInS
-            exact (hfymin x hXInS).left.choose_spec.left
+            exact hXInC
+            exact (hfymin x hXInC).left.choose_spec.left
             rfl
 
 theorem min_comm'
     [LinearOrder R]
     {D2 : Type*}
-    {S2 : Set D2}
+    {C2 : Set D2}
     {f : D → D2 → R}
     {fxmin : D2 → R}
-    {hfxmin : ∀ y ∈ S2, MinimumOn (fun x => f x y) S (fxmin y)}
+    {hfxmin : ∀ y ∈ C2, MinimumOn (fun x => f x y) C (fxmin y)}
     {fymin : D → R}
-    {hfymin : ∀ x ∈ S, MinimumOn (fun y => f x y) S2 (fymin x)}
+    {hfymin : ∀ x ∈ C, MinimumOn (fun y => f x y) C2 (fymin x)}
     {fmin : R}
-    : MinimumOn fxmin S2 fmin ↔ MinimumOn fymin S fmin
+    : MinimumOn fxmin C2 fmin ↔ MinimumOn fymin C fmin
     := by
     constructor
     case mp =>
@@ -439,16 +439,16 @@ theorem min_comm'
 theorem saddle_point_inequality
     [LE R]
     {D2 : Type*}
-    {S2 : Set D2}
+    {C2 : Set D2}
     {f : D → D2 → R}
     {fxmax : D2 → R}
-    {hfxmax : MaximumOn f S fxmax}
+    {hfxmax : MaximumOn f C fxmax}
     {fymin : D → R}
-    {hfymin : MinimumOn (fun y => fun x => f x y) S2 fymin}
+    {hfymin : MinimumOn (fun y => fun x => f x y) C2 fymin}
     (fminmax : R)
-    (hfminmax : MinimumOn fxmax S2 fminmax)
+    (hfminmax : MinimumOn fxmax C2 fminmax)
     (fmaxmin : R)
-    (hfmaxmin : MaximumOn fxmin S fmaxmin)
+    (hfmaxmin : MaximumOn fxmin C fmaxmin)
     : fmaxmin ≤ fminmax
     := by
     sorry

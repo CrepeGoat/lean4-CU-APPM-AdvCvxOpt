@@ -13,27 +13,27 @@ variable
 def LocalMinimizer
     [PseudoMetricSpace D] [LE R]
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     (x : D)
     : Prop
-    := (x ∈ S) ∧ ∃ ε : NNReal, ∀ y ∈ (S ∩ Metric.ball x ε), f x ≤ f y
+    := (x ∈ C) ∧ ∃ ε : NNReal, ∀ y ∈ (C ∩ Metric.ball x ε), f x ≤ f y
 
 def StrictLocalMinimizer
     [PseudoMetricSpace D] [LT R]
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     (x : D)
     : Prop
-    := (x ∈ S) ∧ ∃ ε : NNReal, ∀ y ∈ (S ∩ Metric.ball x ε), f x < f y
+    := (x ∈ C) ∧ ∃ ε : NNReal, ∀ y ∈ (C ∩ Metric.ball x ε), f x < f y
 
 def IsolatedStrictLocalMinimizer
     [PseudoMetricSpace D] [LT R] [LE R]
     (f: D → R)
-    (S: Set D)
+    (C: Set D)
     (x : D)
     : Prop
     :=
-        StrictLocalMinimizer f S x
-        ∧ ∃ ε : NNReal, ∀ y : D, (LocalMinimizer f (S ∩ Metric.ball x ε) y → y = x)
+        StrictLocalMinimizer f C x
+        ∧ ∃ ε : NNReal, ∀ y : D, (LocalMinimizer f (C ∩ Metric.ball x ε) y → y = x)
 
 end main
