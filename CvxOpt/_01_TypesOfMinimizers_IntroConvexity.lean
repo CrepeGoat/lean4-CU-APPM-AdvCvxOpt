@@ -10,6 +10,35 @@ variable
     {D: Type*}
     {R: Type*}
 
+@[deprecated "just use `x ∈ C`" (since := "2025-03-27")]
+def FeasiblePoint
+    (C : Set D)
+    (x : D)
+    : Prop := x ∈ C
+
+example
+    [LE R] {C : Set D} {x : D}
+    : FeasiblePoint C x ↔ x ∈ C
+    := by rfl
+
+@[deprecated "just use `x ∈ ArgumentMinimumOn f C`" (since := "2025-03-27")]
+def GlobalMinimizer
+    [LE R]
+    (f: D → R)
+    (C : Set D)
+    (x : D)
+    : Prop := x ∈ C ∧ ∀ y ∈ C, f x ≤ f y
+
+example
+    [LE R] {f: D → R} {C : Set D} {x : D}
+    : GlobalMinimizer f C x ↔ x ∈ ArgumentMinimumOn f C
+    := by
+    simp [GlobalMinimizer, ArgumentMinimumOn, MinimumOn, IsLeast, lowerBounds]
+    intro xinC _
+    constructor
+    case left => exact xinC
+    case right => exists x
+
 def LocalMinimizer
     [PseudoMetricSpace D] [LE R]
     (f: D → R)
