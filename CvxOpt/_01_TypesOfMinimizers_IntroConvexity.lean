@@ -15,7 +15,7 @@ variable
     {D: Type*}
     {R: Type*}
 
-@[deprecated "just use `x ∈ C`" (since := "2025-03-27")]
+-- @[deprecated "just use `x ∈ C`" (since := "2025-03-27")]
 def FeasiblePoint
     (C : Set D)
     (x : D)
@@ -26,7 +26,7 @@ example
     : FeasiblePoint C x ↔ x ∈ C
     := by rfl
 
-@[deprecated "just use `x ∈ ArgumentMinimumOn f C`" (since := "2025-03-27")]
+-- @[deprecated "just use `x ∈ ArgumentMinimumOn f C`" (since := "2025-03-27")]
 def GlobalMinimizer
     [LE R]
     (f: D → R)
@@ -111,16 +111,13 @@ def IsolatedStrictLocalMinimizer
         StrictLocalMinimizer f C x
         ∧ ∃ ε : NNReal, ∀ y : D, (LocalMinimizer f (C ∩ Metric.ball x ε) y → y = x)
 
-
 def CriticalPoint
     [RCLike R] [NormedAddCommGroup D] [InnerProductSpace R D] [CompleteSpace D]
-    -- (f: (Fin n → D) → R)
-    -- (C: Set (Fin n → D))
-    -- (x: Fin n → D)
     (f: D → R)
+    (C : Set D)
     (x : D)
     : Prop
-    := gradient f x = 0
+    := HasGradientWithinAt f 0 C x
 
 theorem local_min_and_open_then_critical_point
     [NormedAddCommGroup D] [CompleteSpace D]
@@ -131,8 +128,17 @@ theorem local_min_and_open_then_critical_point
     {x : D}
     (hLocalMin : LocalMinimizer f C x)
     (hCIsOpen : IsOpen C)
-    : CriticalPoint f x
+    : CriticalPoint f C x
     := by
+    simp only [CriticalPoint, HasGradientWithinAt, HasGradientAtFilter, map_zero, nhdsWithin, nhds,
+      Set.mem_setOf_eq, Filter.principal]
+    constructor; case isLittleOTVS =>
+    simp only [ContinuousLinearMap.zero_apply, sub_zero]
+    simp [LocalMinimizer] at hLocalMin
+    intro U hU
+    exists Metric.ball 0 (hLocalMin.right.choose)
+    -- unfold fderiv
+
     /-
     - take a local min -> it's smaller than all other points in some open ball
     - C is open -> that ball of points are all feasible
@@ -142,6 +148,38 @@ theorem local_min_and_open_then_critical_point
         -> the gradient on this component is zero
     - the overall gradient is zero
     -/
+    sorry
+
+def SaddlePoint
+    [LE R] [RCLike R] [NormedAddCommGroup D] [InnerProductSpace R D] [CompleteSpace D]
+    (f: D → R)
+    (C : Set D)
+    (x : D)
+    : Prop
+    := CriticalPoint f C x ∧ ¬LocalMinimizer f C x
+
+example
+    : SaddlePoint (fun x: Real => x ^ 3) Set.univ 0
+    := by
+    simp only [SaddlePoint, CriticalPoint, hasGradientWithinAt_univ, LocalMinimizer, Set.mem_univ,
+      Set.univ_inter, Metric.mem_ball, dist_zero_right, Real.norm_eq_abs, ne_eq,
+      OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, true_and, not_exists, not_forall,
+      Classical.not_imp, not_le]
+    constructor
+    case left =>
+        sorry
+    case right =>
+        sorry
+
+theorem inf_on_compact_then_min
+    [TopologicalSpace D] [LE R]
+    {f: D → R}
+    {C: Set D}
+    {inf : R}
+    (hinf : InfimumOn f C inf)
+    (hCIsCompact : IsCompact C)
+    : MinimumOn f C inf
+    := by
     sorry
 
 end main
