@@ -122,4 +122,6 @@ fix: add `pkgs.gcc` to nix-shell file -> ✅
 	- tutorial - https://lean-lang.org/functional_programming_in_lean/
 - hard to grok things
 	- type classes - https://lean-lang.org/doc/reference/latest/Type-Classes/#type-classes
-	- `theorem` vs. `def` - https://leanprover.github.io/theorem_proving_in_lean4/propositions_and_proofs.html#working-with-propositions-as-types
+	- `theorem` vs. `def`
+		- https://leanprover.github.io/theorem_proving_in_lean4/propositions_and_proofs.html#working-with-propositions-as-types
+		- https://proofassistants.stackexchange.com/a/1576

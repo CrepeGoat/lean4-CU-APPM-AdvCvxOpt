@@ -1,4 +1,8 @@
 import Init.Prelude
+import Mathlib.Analysis.RCLike.Basic
+import Mathlib.Analysis.InnerProductSpace.Defs
+import Mathlib.Analysis.Calculus.Gradient.Basic
+import Mathlib.Topology.Defs.Basic
 
 import CvxOpt._00_IntroToOptProblems
 import CvxOpt._01_TypesOfMinimizers_IntroConvexity_pre
@@ -7,6 +11,7 @@ import CvxOpt._01_TypesOfMinimizers_IntroConvexity_pre
 section main
 
 variable
+    {n : Nat}
     {D: Type*}
     {R: Type*}
 
@@ -39,6 +44,31 @@ example
     case left => exact xinC
     case right => exists x
 
+example
+    : ArgumentMinimumOn (fun x : NNReal => x ^ 2) (setOf (fun x => 0 < x ∧ x < 1)) = ∅
+    := by
+    rw [← Set.not_nonempty_iff_eq_empty]
+    simp [ArgumentMinimumOn, MinimumOn, IsLeast, lowerBounds, Set.Nonempty]
+    intro x h h'
+    exists (x / 2)^2, x / 2
+    simp
+    constructor
+    case left => exact h
+    case right =>
+
+    constructor
+    case left =>
+        simp [div_lt_iff₀]
+        apply lt_trans
+        exact h'
+        simp
+    case right =>
+
+    apply pow_lt_pow_left₀
+    case a => simp
+    case hab => simp [h]
+    case ha => simp [h']
+
 def LocalMinimizer
     [PseudoMetricSpace D] [LE R]
     (f: D → R)
@@ -64,5 +94,17 @@ def IsolatedStrictLocalMinimizer
     :=
         StrictLocalMinimizer f C x
         ∧ ∃ ε : NNReal, ∀ y : D, (LocalMinimizer f (C ∩ Metric.ball x ε) y → y = x)
+
+
+def CriticalPoint
+    [RCLike R] [NormedAddCommGroup D] [InnerProductSpace R D] [CompleteSpace D]
+    -- (f: (Fin n → D) → R)
+    -- (C: Set (Fin n → D))
+    -- (x: Fin n → D)
+    (f: D → R)
+    (x : D)
+    : Prop
+    := gradient f x = 0
+
 
 end main
