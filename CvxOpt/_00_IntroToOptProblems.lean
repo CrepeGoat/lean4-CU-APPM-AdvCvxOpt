@@ -78,7 +78,7 @@ def SupremumOn
     : Prop
     := IsLUB (C.image f) value
 
-theorem inf_of_min
+theorem min_then_inf
     {f: D → R}
     {C: Set D}
     {min : R}
@@ -95,7 +95,7 @@ theorem inf_of_min
     apply h
     exact hmin.left.choose_spec.left
 
-theorem min_of_inf_and_exists
+theorem inf_and_argmin_exists_then_min
     {f: D → R}
     {C: Set D}
     {inf : R}
@@ -110,6 +110,16 @@ theorem min_of_inf_and_exists
     exact h
     intro x hXInS
     exact hinf.left x hXInS
+
+theorem inf_then_min_closure
+    [TopologicalSpace D]
+    {f: D → R}
+    {C: Set D}
+    {inf : R}
+    (hinf : InfimumOn f C inf)
+    : MinimumOn f (closure C) inf
+    := by
+    sorry
 
 /--
 If a function is L-continuous, any two points that are a distance `d` apart
