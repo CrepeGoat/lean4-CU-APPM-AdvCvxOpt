@@ -77,6 +77,21 @@ def LocalMinimizer
     : Prop
     := (x ∈ C) ∧ ∃ ε : NNReal, ∀ y ∈ (C ∩ Metric.ball x ε), f x ≤ f y
 
+theorem global_min_then_local_min
+    [PseudoMetricSpace D] [LE R]
+    {f: D → R}
+    {C: Set D}
+    {x : D}
+    : GlobalMinimizer f C x → LocalMinimizer f C x
+    := by
+    simp [GlobalMinimizer, LocalMinimizer, nndist]
+    intro hx hXIsMin
+    constructor
+    exact hx
+    exists 1
+    intro x2 hx2 _
+    exact hXIsMin x2 hx2
+
 def StrictLocalMinimizer
     [PseudoMetricSpace D] [LT R]
     (f: D → R)
