@@ -119,7 +119,7 @@ def CriticalPoint
     : Prop
     := HasGradientWithinAt f 0 C x
 
-theorem local_min_and_open_then_critical_point
+theorem local_min_on_open_set_then_critical_point
     [NormedAddCommGroup D] [CompleteSpace D]
     [LE R] [RCLike R]
     [InnerProductSpace R D]
@@ -131,11 +131,19 @@ theorem local_min_and_open_then_critical_point
     : CriticalPoint f C x
     := by
     simp only [CriticalPoint, HasGradientWithinAt, HasGradientAtFilter, map_zero, nhdsWithin, nhds,
-      Set.mem_setOf_eq, Filter.principal]
+        Set.mem_setOf_eq, Filter.principal]
     constructor; case isLittleOTVS =>
     simp only [ContinuousLinearMap.zero_apply, sub_zero]
-    simp [LocalMinimizer] at hLocalMin
     intro U hU
+
+    simp only [LocalMinimizer, Set.mem_inter_iff, Metric.mem_ball, dist_lt_coe,
+        and_imp] at hLocalMin
+    simp only [IsOpen] at hCIsOpen
+    unfold TopologicalSpace.IsOpen at hCIsOpen
+    simp only [UniformSpace.toTopologicalSpace, PseudoMetricSpace.toUniformSpace,
+        SeminormedAddCommGroup.toPseudoMetricSpace, NormedAddCommGroup.toSeminormedAddCommGroup,
+        MetricSpace.toPseudoMetricSpace, NormedAddCommGroup.toMetricSpace] at hCIsOpen
+
     exists Metric.ball 0 (hLocalMin.right.choose)
     -- unfold fderiv
 
@@ -171,7 +179,7 @@ example
     case right =>
         sorry
 
-theorem inf_on_compact_then_min
+theorem inf_on_compact_set_then_min
     [TopologicalSpace D] [LE R]
     {f: D → R}
     {C: Set D}
