@@ -44,6 +44,7 @@ example
     case left => exact xinC
     case right => exists x
 
+/- Note: solutions may not exist-/
 example
     : ArgumentMinimumOn (fun x : NNReal => x ^ 2) (setOf (fun x => 0 < x ∧ x < 1)) = ∅
     := by
@@ -121,5 +122,26 @@ def CriticalPoint
     : Prop
     := gradient f x = 0
 
+theorem local_min_and_open_then_critical_point
+    [NormedAddCommGroup D] [CompleteSpace D]
+    [LE R] [RCLike R]
+    [InnerProductSpace R D]
+    {f: D → R}
+    {C: Set D}
+    {x : D}
+    (hLocalMin : LocalMinimizer f C x)
+    (hCIsOpen : IsOpen C)
+    : CriticalPoint f x
+    := by
+    /-
+    - take a local min -> it's smaller than all other points in some open ball
+    - C is open -> that ball of points are all feasible
+    - for each component / dimension of xmin:
+        - add ε to xmin_i -> this point is bigger -> the gradient must be non-negative
+        - sub ε to xmin_i -> this point is also bigger -> the gradient must be non-positive
+        -> the gradient on this component is zero
+    - the overall gradient is zero
+    -/
+    sorry
 
 end main
