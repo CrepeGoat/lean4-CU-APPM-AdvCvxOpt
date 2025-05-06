@@ -5,7 +5,6 @@ import Mathlib.Analysis.Calculus.Gradient.Basic
 import Mathlib.Topology.Defs.Basic
 
 import CvxOpt._00_IntroToOptProblems
-import CvxOpt._01_TypesOfMinimizers_IntroConvexity_pre
 
 
 section main
