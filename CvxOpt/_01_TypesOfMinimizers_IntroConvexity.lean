@@ -8,7 +8,6 @@ import CvxOpt._00_IntroToOptProblems
 
 
 section main
-
 variable
     {n : Nat}
     {D: Type*}
@@ -70,15 +69,15 @@ example
     case ha => simp [h']
 
 def LocalMinimizer
-    [PseudoMetricSpace D] [LE R]
+    [TopologicalSpace D] [LE R]
     (f: D → R)
     (C: Set D)
     (x : D)
     : Prop
-    := (x ∈ C) ∧ ∃ ε : NNReal, ∀ y ∈ (C ∩ Metric.ball x ε), f x ≤ f y
+    := (x ∈ C) ∧ ∃ x_nhd ∈ nhdsWithin x C, ∀ y ∈ x_nhd, f x ≤ f y
 
 theorem global_min_then_local_min
-    [PseudoMetricSpace D] [LE R]
+    [TopologicalSpace D] [LE R]
     {f: D → R}
     {C: Set D}
     {x : D}
@@ -88,27 +87,26 @@ theorem global_min_then_local_min
     intro hx hXIsMin
     constructor
     exact hx
-    exists 1
-    intro x2 hx2 _
-    exact hXIsMin x2 hx2
+    refine Filter.eventually_iff_exists_mem.mp ?_
+    exact eventually_nhdsWithin_of_forall hXIsMin
 
 def StrictLocalMinimizer
-    [PseudoMetricSpace D] [LT R]
+    [TopologicalSpace D] [LT R]
     (f: D → R)
     (C: Set D)
     (x : D)
     : Prop
-    := (x ∈ C) ∧ ∃ ε : NNReal, ∀ y ∈ (C ∩ Metric.ball x ε), f x < f y
+    := (x ∈ C) ∧ ∃ x_nhd ∈ nhdsWithin x C, ∀ y ∈ x_nhd, f x < f y
 
 def IsolatedStrictLocalMinimizer
-    [PseudoMetricSpace D] [LT R] [LE R]
+    [TopologicalSpace D] [LT R] [LE R]
     (f: D → R)
     (C: Set D)
     (x : D)
     : Prop
     :=
         StrictLocalMinimizer f C x
-        ∧ ∃ ε : NNReal, ∀ y : D, (LocalMinimizer f (C ∩ Metric.ball x ε) y → y = x)
+        ∧ ∃ x_nhd ∈ nhdsWithin x C, ∀ y ∈ x_nhd, (LocalMinimizer f C y → y = x)
 
 def CriticalPoint
     [RCLike R] [NormedAddCommGroup D] [InnerProductSpace R D] [CompleteSpace D]
@@ -140,21 +138,7 @@ theorem local_min_on_open_set_then_critical_point
     (hCIsOpen : IsOpen C)
     : CriticalPoint f C x
     := by
-    simp only [CriticalPoint, HasGradientWithinAt, HasGradientAtFilter, map_zero, nhdsWithin, nhds,
-        Set.mem_setOf_eq, Filter.principal]
-    constructor; case isLittleOTVS =>
-    simp only [ContinuousLinearMap.zero_apply, sub_zero]
-    intro U hU
-
-    simp only [LocalMinimizer, Set.mem_inter_iff, Metric.mem_ball, dist_lt_coe,
-        and_imp] at hLocalMin
-    simp only [IsOpen] at hCIsOpen
-    unfold TopologicalSpace.IsOpen at hCIsOpen
-    simp only [UniformSpace.toTopologicalSpace, PseudoMetricSpace.toUniformSpace,
-        SeminormedAddCommGroup.toPseudoMetricSpace, NormedAddCommGroup.toSeminormedAddCommGroup,
-        MetricSpace.toPseudoMetricSpace, NormedAddCommGroup.toMetricSpace] at hCIsOpen
-
-    exists Metric.ball 0 (hLocalMin.right.choose)
+    sorry
     -- unfold fderiv
 
     /-
@@ -180,11 +164,11 @@ example
     : SaddlePoint (fun x: Real => x ^ 3) Set.univ 0
     := by
     simp only [SaddlePoint, CriticalPoint, hasGradientWithinAt_univ, LocalMinimizer, Set.mem_univ,
-      Set.univ_inter, Metric.mem_ball, dist_zero_right, Real.norm_eq_abs, ne_eq,
-      OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, true_and, not_exists, not_forall,
-      Classical.not_imp, not_le]
+      nhdsWithin_univ, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, true_and,
+      not_exists, not_and, not_forall, Classical.not_imp, not_le]
     constructor
     case left =>
+        simp [HasGradientAt, HasGradientAtFilter]
         sorry
     case right =>
         sorry
