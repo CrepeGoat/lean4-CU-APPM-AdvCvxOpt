@@ -119,13 +119,14 @@ def CriticalPoint
     := HasGradientWithinAt f 0 C x
 
 example
-    : CriticalPoint (fun x: Real => x ^ 2) Set.univ 0
+    [InnerProductSpace ℝ (Fin n → ℝ)]
+    : CriticalPoint (fun x: Fin n → ℝ => ‖x‖ ^ 2) Set.univ 0
     := by
     unfold CriticalPoint
     refine hasGradientWithinAt_univ.mpr ?_
     refine hasGradientAt_iff_isLittleO_nhds_zero.mpr ?_
     simp
-    refine Asymptotics.isLittleO_pow_id ?_
+    refine Asymptotics.isLittleO_norm_pow_id ?_
     exact Nat.one_lt_two
 
 theorem local_min_on_open_set_then_critical_point
