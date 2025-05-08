@@ -152,6 +152,37 @@ theorem local_min_on_open_set_then_critical_point
     -/
     sorry
 
+private def nhd0_contains_neg
+    : ∀ nhd0 ∈ nhds (0 : ℝ), ∃ x ∈ nhd0, x < 0
+    := by
+    intro nhd0 hNhd0
+    have hIoo0 := mem_nhds_iff_exists_Ioo_subset.mp hNhd0
+    constructor
+    case w => exact hIoo0.choose * (1 / 2)
+
+    have _0inIoo := hIoo0.choose_spec.choose_spec.left
+    rw [← Set.Ioo_def] at _0inIoo
+    simp at _0inIoo
+    have hLLt0 := _0inIoo.left
+
+    constructor
+    case right => refine mul_neg_of_neg_of_pos hLLt0 one_half_pos
+
+    have hIsSubset := hIoo0.choose_spec.choose_spec.right
+    rw [(Set.Ioo hIoo0.choose hIoo0.choose_spec.choose).subset_def] at hIsSubset
+    apply hIsSubset
+    rw [← Set.Ioo_def]
+    constructor
+
+    nth_rewrite 1 [← mul_one hIoo0.choose]
+    refine mul_lt_mul_of_neg_left one_half_lt_one hLLt0
+
+    apply lt_of_le_of_lt
+    case h.left.a.right.b => exact 0
+    case h.left.a.right.hbc => exact _0inIoo.right
+    rw [le_iff_lt_or_eq]; apply Or.intro_left
+    refine mul_neg_of_neg_of_pos hLLt0 one_half_pos
+
 def SaddlePoint
     [LE R] [RCLike R] [NormedAddCommGroup D] [InnerProductSpace R D] [CompleteSpace D]
     (f: D → R)
@@ -161,17 +192,30 @@ def SaddlePoint
     := CriticalPoint f C x ∧ ¬LocalMinimizer f C x
 
 example
-    : SaddlePoint (fun x: Real => x ^ 3) Set.univ 0
+    -- [PreirreducibleSpace ℝ]
+    : SaddlePoint (fun x: ℝ => x ^ 3) Set.univ 0
     := by
     simp only [SaddlePoint, CriticalPoint, hasGradientWithinAt_univ, LocalMinimizer, Set.mem_univ,
       nhdsWithin_univ, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, true_and,
       not_exists, not_and, not_forall, Classical.not_imp, not_le]
     constructor
     case left =>
-        simp [HasGradientAt, HasGradientAtFilter]
-        sorry
+        refine HasDerivAt.hasGradientAt' ?_
+        unfold HasDerivAt
+        refine hasDerivAtFilter_iff_isLittleO.mpr ?_
+        simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, sub_zero, smul_eq_mul,
+          mul_zero]
+        refine Asymptotics.isLittleO_pow_id ?_
+        exact Nat.one_lt_succ_succ 1
     case right =>
-        sorry
+        intro nhd0 hNhd0
+        -- rw [mem_nhds_iff] at hNhd0
+        refine bex_def.mpr ?_
+        have three_odd : Odd 3 := by
+            exact Nat.odd_iff.mpr rfl
+        simp_rw [three_odd.pow_neg_iff]
+        apply nhd0_contains_neg
+        exact hNhd0
 
 theorem inf_on_compact_set_then_min
     [TopologicalSpace D] [LE R]
