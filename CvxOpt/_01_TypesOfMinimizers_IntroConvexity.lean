@@ -127,17 +127,36 @@ example
     refine Asymptotics.isLittleO_norm_pow_id ?_
     exact Nat.one_lt_two
 
-theorem local_min_on_open_set_then_critical_point
+theorem local_min_on_interior_then_critical_point
     [NormedAddCommGroup D] [CompleteSpace D]
     [LE R] [RCLike R]
     [InnerProductSpace R D]
     {f: D → R}
     {C: Set D}
-    {x : D}
-    (hLocalMin : LocalMinimizer f C x)
-    (hCIsOpen : IsOpen C)
-    : CriticalPoint f C x
+    {xmin : D}
+    (hLocalMin : LocalMinimizer f C xmin)
+    (hXInInt : xmin ∈ interior C)
+    : CriticalPoint f C xmin
     := by
+    unfold CriticalPoint
+    unfold HasGradientWithinAt
+    unfold HasGradientAtFilter
+    rw [map_zero]
+    apply hasFDerivAtFilter_iff_isLittleO.mpr
+    simp only [ContinuousLinearMap.zero_apply, sub_zero]
+
+    rcases hLocalMin with ⟨hXminInC, ⟨nhdXmin, ⟨hNhdXmin, hXminMinInNhd⟩⟩⟩
+    rcases hXInInt with ⟨CInt, ⟨⟨hCIntOpen, hCIntSubC⟩, hXminInCInt⟩⟩
+    apply Asymptotics.isLittleO_iff_nat_mul_le.mpr
+    intro n
+
+
+
+    -- simp only [nhdsWithin, nhds, Set.mem_setOf_eq, Filter.principal]
+
+
+
+
     sorry
     -- unfold fderiv
 
@@ -189,19 +208,17 @@ example
         intro nhd0 hNhd0
         -- rw [mem_nhds_iff] at hNhd0
         refine bex_def.mpr ?_
-        have three_odd : Odd 3 := by
-            exact Nat.odd_iff.mpr rfl
+        have three_odd : Odd 3 := by exact Nat.odd_iff.mpr rfl
         simp_rw [three_odd.pow_neg_iff]
-        apply nhd0_contains_neg
-        exact hNhd0
+        exact nhd0_contains_neg nhd0 hNhd0
 
 theorem inf_on_compact_set_then_min
     [TopologicalSpace D] [LE R]
     {f: D → R}
     {C: Set D}
     {inf : R}
-    (hinf : InfimumOn f C inf)
     (hCIsCompact : IsCompact C)
+    (hinf : InfimumOn f C inf)
     : MinimumOn f C inf
     := by
     sorry
