@@ -147,13 +147,20 @@ theorem local_min_on_interior_then_critical_point
 
     rcases hLocalMin with ⟨hXminInC, ⟨nhdXmin, ⟨hNhdXmin, hXminMinInNhd⟩⟩⟩
     rcases hXInInt with ⟨CInt, ⟨⟨hCIntOpen, hCIntSubC⟩, hXminInCInt⟩⟩
-    apply Asymptotics.isLittleO_iff_nat_mul_le.mpr
-    intro n
+    rw [Asymptotics.IsLittleO_def]
+    intro c hc
+    rw [Asymptotics.isBigOWith_iff, Filter.eventually_iff_seq_eventually]
+    intro g hg
+    rw [Filter.eventually_atTop]
 
+
+
+    -- apply Asymptotics.isLittleO_iff_nat_mul_le.mpr
+    -- intro n
+    -- apply?
 
 
     -- simp only [nhdsWithin, nhds, Set.mem_setOf_eq, Filter.principal]
-
 
 
 
